@@ -33,7 +33,6 @@ export class NucleoController {
       const products = await this.nucleoService.getAllProductsWithStock();
       //return res.status(200).json(products);
       
-      console.log(products)
       const limitedProducts = products.slice(0, 500); // Demostración de los primeros 500 productos. // Temporal.
       return res.status(200).json(limitedProducts); // Temporal.
 
