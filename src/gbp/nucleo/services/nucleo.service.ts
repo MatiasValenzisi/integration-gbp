@@ -4,6 +4,7 @@ import { Xml2jsService } from './xml2js.service';
 import { CredentialService } from './credential.service';
 import { LoginResponse } from '../interfaces/login-response.interface';
 import { BrandItem } from '../interfaces/brand-Item.interface';
+import * as uuidValidate from 'uuid-validate';
 
 @Injectable()
 export class NucleoService {
@@ -39,10 +40,16 @@ export class NucleoService {
       const soapAction: string = 'http://microsoft.com/webservices/AuthenticateUser';
       const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);
       const jsonResponse: LoginResponse = await this.xml2jsService.xmlToObjectLoginResponse(soapResponse);
-      return jsonResponse["soap:Envelope"]["soap:Body"]["AuthenticateUserResponse"]["AuthenticateUserResult"];
+      const response: string = jsonResponse["soap:Envelope"]["soap:Body"]["AuthenticateUserResponse"]["AuthenticateUserResult"];
+      
+      if (!uuidValidate(response)){
+        throw new Error(`authenticate | Error al obtener el token | ${response}`);
+      }
+
+      return response;
 
     } catch (error) {
-      throw new Error(`postLogin | Error en la solicitud de autenticación | ${error}`);
+      throw new Error(`authenticate | Error en la solicitud de autenticación | ${error}`);
     }
   }
 

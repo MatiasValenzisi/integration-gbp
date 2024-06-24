@@ -56,14 +56,15 @@ $ npm run start:dev
 
 ## Dependencias
 
-- @nestjs/common: Utilidades comunes de NestJS. Version ^10.0.0
-- @nestjs/core: Núcleo de NestJS. Version ^10.0.0
-- @nestjs/platform-express: Plataforma Express para NestJS. Version ^10.0.0
-- axios: Cliente HTTP para hacer solicitudes. Version ^1.7.2
-- dotenv: Carga variables de entorno desde un archivo .env. Version ^16.4.5
-- reflect-metadata: Añade soporte de metadatos de decoración a TypeScript. Version ^0.2.0
-- rxjs: Librería para programación reactiva. Version ^7.8.1
-- xml2js: Convertidor de XML a JavaScript. Version ^0.6.2
+- @nestjs/common: Utilidades comunes de NestJS. Versión ^10.0.0
+- @nestjs/core: Núcleo de NestJS. Versión ^10.0.0
+- @nestjs/platform-express: Plataforma Express para NestJS. Versión ^10.0.0
+- axios: Cliente HTTP para hacer solicitudes. Versión ^1.7.2
+- dotenv: Carga variables de entorno desde un archivo .env. Versión ^16.4.5
+- reflect-metadata: Añade soporte de metadatos de decoración a TypeScript. Versión ^0.2.0
+- rxjs: Librería para programación reactiva. Versión ^7.8.1
+- uuid-validate: Valida si un dato es un uuid. Versión ^0.0.3
+- xml2js: Convertidor de XML a JavaScript. Versión ^0.6.2
 
 
 ## Documentación
