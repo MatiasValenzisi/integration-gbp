@@ -33,12 +33,9 @@ npm install
 # Development
 $ npm run start:dev
 ```
+<!-- ## Estructura del proyecto -->
 
-## Estructura del proyecto
-
-## Estructura del proyecto
-
-src/
+<!-- src/
 ├── app.module.ts          # Módulo principal
 ├── gbp/
 │   └── nucleo/
@@ -49,7 +46,7 @@ src/
 │       ├── nucleo.controller.ts         # Controlador del módulo Nucleo
 │       └── nucleo.module.ts             # Módulo Nucleo
 ├── common/                # Utilidades y middlewares comunes
-└── main.ts                # Punto de entrada de la aplicación
+└── main.ts                # Punto de entrada de la aplicación -->
 
 ## Tecnologia
 
