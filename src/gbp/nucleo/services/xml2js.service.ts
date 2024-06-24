@@ -33,29 +33,29 @@ export class Xml2jsService {
       const objectData: BrandsResponse = await this.xmlToObjectBrandResponse(xmlData);
       return this.transformBrandItem(objectData);
     } catch (error) {
-      throw new Error(`parseBrandsSoapResponse | Error al parsear respuesta SOAP | ${error.message}`);
+      throw new Error(`parseBrandsSoapResponse | ${error.message}`);
     }
   }
 
-  async parseProductsSoapResponse(soapResponse: string): Promise<ProductItem[]> {
+  async parseProductsWithStockSoapResponse(soapResponse: string): Promise<ProductItem[]> {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);
       const xmlData = this.extractXmlProductsData(soapBody);
       const objectData: ProductsResponse = await this.xmlToObjectProductsResponse(xmlData);
       return this.transformProductItem(objectData);
     } catch (error) {
-      throw new Error(`parseProductsSoapResponse | Error al parsear respuesta SOAP | ${error.message}`);
+      throw new Error(`parseProductsWithStockSoapResponse | ${error.message}`);
     }
   }
 
-  async parseProductsPaginatedSoapResponse(soapResponse: string): Promise<ProductItem[]> {
+  async parseProductsWithStockPaginatedSoapResponse(soapResponse: string): Promise<ProductItem[]> {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);
       const xmlData = this.extractXmlProductsPaginatedData(soapBody);
       const objectData: ProductsResponse = await this.xmlToObjectProductsResponse(xmlData);
       return this.transformProductItem(objectData);
     } catch (error) {
-      throw new Error(`parseProductsPaginatedSoapResponse | Error al parsear respuesta SOAP | ${error.message}`);
+      throw new Error(`parseProductsWithStockPaginatedSoapResponse | ${error.message}`);
     }
   }
 
@@ -100,7 +100,7 @@ export class Xml2jsService {
 
   private extractXmlProductsData(soapBody: any): string {
 
-    const wsFullJaus_Item_funGetXMLDataResult: string = soapBody.wsFullJaus_Item_funGetXMLData_PaginatedResponse.wsFullJaus_Item_funGetXMLDataResult;
+    const wsFullJaus_Item_funGetXMLDataResult: string = soapBody.wsFullJaus_Item_funGetXMLDataResponse.wsFullJaus_Item_funGetXMLDataResult;
     if (!wsFullJaus_Item_funGetXMLDataResult) {
       throw new Error(`extractXmlData | No se encontró wsFullJaus_Item_funGetXMLDataResult en el cuerpo SOAP`);
     }
@@ -109,7 +109,7 @@ export class Xml2jsService {
 
   private extractXmlProductsPaginatedData(soapBody: any): string {
 
-    const wsFullJaus_Item_funGetXMLData_PaginatedResult: string = soapBody.wsFullJaus_Item_funGetXMLDataResponse.wsFullJaus_Item_funGetXMLData_PaginatedResult;
+    const wsFullJaus_Item_funGetXMLData_PaginatedResult: string = soapBody.wsFullJaus_Item_funGetXMLData_PaginatedResponse.wsFullJaus_Item_funGetXMLData_PaginatedResult;
     if (!wsFullJaus_Item_funGetXMLData_PaginatedResult) {
       throw new Error(`extractXmlData | No se encontró wsFullJaus_Item_funGetXMLData_PaginatedResult en el cuerpo SOAP`);
     }
@@ -134,7 +134,9 @@ export class Xml2jsService {
       throw new Error(`objectData | Formato de datos incorrecto`);
     }
 
-    return objectData.NewDataSet.Table.map(item => (
+    return objectData.NewDataSet.Table
+    .filter(item => Number(item.stock) > 0)
+    .map(item => (
       {
         item_id: item.item_id || '',
         item_code: item.item_code || '',

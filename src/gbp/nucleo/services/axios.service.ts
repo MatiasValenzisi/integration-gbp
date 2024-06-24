@@ -23,7 +23,7 @@ export class AxiosService {
       return response.data;
 
     } catch (error) {
-      throw new Error(`sendRequest - axios.service | Failed to send ${method} request | Error: ${error.message}`);
+      throw new Error(`sendRequest - axios.service | Error: ${error.message}`);
     }
   }
 

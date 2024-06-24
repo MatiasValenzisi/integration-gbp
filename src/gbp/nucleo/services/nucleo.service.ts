@@ -43,13 +43,13 @@ export class NucleoService {
       const response: string = jsonResponse["soap:Envelope"]["soap:Body"]["AuthenticateUserResponse"]["AuthenticateUserResult"];
       
       if (!uuidValidate(response)){
-        throw new Error(`authenticate | Error al obtener el token | ${response}`);
+        throw new Error(`authenticate | ${response}`);
       }
 
       return response;
 
     } catch (error) {
-      throw new Error(`authenticate | Error en la solicitud de autenticación | ${error}`);
+      throw new Error(`authenticate | ${error}`);
     }
   }
 
@@ -84,11 +84,11 @@ export class NucleoService {
       return parseResponseData;
 
     } catch (error) {
-      throw new Error(`getAllBrands | Error al obtener las marcas | ${error}`);
+      throw new Error(`getAllBrands | ${error}`);
     }
   }
 
-  async getAllProducts(): Promise<any> {
+  async getAllProductsWithStock(): Promise<any> {
 
     const token = await this.authenticate();
 
@@ -115,17 +115,18 @@ export class NucleoService {
 
       const soapAction: string = 'http://microsoft.com/webservices/wsFullJaus_Item_funGetXMLData';
       const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);          
-      const parseResponseData = await this.xml2jsService.parseProductsSoapResponse(soapResponse); 
+      const parseResponseData = await this.xml2jsService.parseProductsWithStockSoapResponse(soapResponse); 
       return parseResponseData;
 
     } catch (error) {
-      throw new Error(`getAllProducts - service | Error al obtener los productos | ${error.message} `);
+      throw new Error(`getAllProducts - service | ${error.message} `);
     }
   }
 
-  async getAllProductsPaginated(pagination: number, ): Promise<any> {
+  async getAllProductsWithStockPaginated(pageNumber: number): Promise<any> {
 
-    const token = await this.authenticate();
+    const token: string = await this.authenticate();
+    const pageSize: string = "500";
 
     // Soap 1.2
     const soapRequestBody = `<?xml version="1.0" encoding="utf-8"?>
@@ -143,8 +144,8 @@ export class NucleoService {
       </soap12:Header>
       <soap12:Body>
         <wsFullJaus_Item_funGetXMLData_Paginated xmlns="http://microsoft.com/webservices/">
-          <intPageNumber>1</intPageNumber>
-          <intPageSize>50</intPageSize>
+          <intPageNumber>${pageNumber}</intPageNumber>
+          <intPageSize>${pageSize}</intPageSize>
         </wsFullJaus_Item_funGetXMLData_Paginated>
       </soap12:Body>
     </soap12:Envelope>`;
@@ -153,7 +154,7 @@ export class NucleoService {
 
       const soapAction: string = 'http://microsoft.com/webservices/wsFullJaus_Item_funGetXMLData_Paginated';
       const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);          
-      // const parseResponseData = await this.xml2jsService.parseProductsPaginatedSoapResponse(soapResponse); 
+      //const parseResponseData = await this.xml2jsService.parseProductsWithStockPaginatedSoapResponse(soapResponse); 
       //return parseResponseData;
 
       console.log(soapResponse); // temporal.
