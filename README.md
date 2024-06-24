@@ -30,9 +30,11 @@ npm install
 ## Iniciar el servidor en desarrollo
 
 ```bash
-# development
+# Development
 $ npm run start:dev
 ```
+
+## Estructura del proyecto
 
 ## Estructura del proyecto
 
@@ -46,7 +48,6 @@ src/
 │       │   └── axios.service.ts         # Servicio de Axios para Nucleo.
 │       ├── nucleo.controller.ts         # Controlador del módulo Nucleo
 │       └── nucleo.module.ts             # Módulo Nucleo
-│
 ├── common/                # Utilidades y middlewares comunes
 └── main.ts                # Punto de entrada de la aplicación
 
