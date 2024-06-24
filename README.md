@@ -15,10 +15,10 @@ Proyecto para pruebas con integración a GBP utilizando NestJS.
 
 ```bash
 # Clonar el repositorio.
-git clone https://github.com/MatiasValenzisi/integragration-gbp
+git clone https://github.com/MatiasValenzisi/integration-gbp
 
 # Navegar al directorio del proyecto.
-cd integragration-gbp
+cd integration-gbp
 
 # Copiar y renombrar el archivo .env.example por .env
 Configurar puerto a utilizar y credenciales.
