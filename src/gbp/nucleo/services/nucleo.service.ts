@@ -6,6 +6,7 @@ import { LoginResponse } from '../interfaces/login-response.interface';
 import { BrandItem } from '../interfaces/brand-Item.interface';
 import * as uuidValidate from 'uuid-validate';
 import { ProductItem } from '../interfaces/product-Item.interface';
+import { ProductStorageGroupItem } from '../interfaces/product-storage-group-Item.interface';
 
 @Injectable()
 export class NucleoService {
@@ -124,7 +125,7 @@ export class NucleoService {
     }
   }
 
-  async getAllProductsStorageGroup(): Promise<any> {
+  async getAllProductsStorageGroup(): Promise<ProductStorageGroupItem[]> {
 
     const token: string = await this.authenticate();
 
@@ -158,7 +159,7 @@ export class NucleoService {
       return parseResponseData;
 
     } catch (error) {
-      throw new Error(`getAllProducts - service | ${error.message} `);
+      throw new Error(`getAllProductsStorageGroup - service | ${error.message} `);
     }
   }
 }
