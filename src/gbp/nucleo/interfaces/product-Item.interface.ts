@@ -1,5 +1,5 @@
-// Soap 1.2
-export interface ProductItem {
+export interface ProductItem 
+{
   item_id: string;
   item_code: string;
   item_desc: string;

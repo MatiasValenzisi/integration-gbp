@@ -1,5 +1,5 @@
-// Soap 1.2
-export interface ProductStorageGroupItem {
+export interface ProductStorageGroupItem 
+{  
   item_id: string;
   item_code: string;
   item_desc: string;
@@ -51,9 +51,7 @@ export interface ProductStorageGroupItem {
   item_disabledInBalance: string;
   mu_id: string;
   stock: string;
-  PhisicalStock: string;
   tax_id: string;
-  option_id: string;
   tax_percentage: string;
   tax_id_II: string;
   tax_percentage_II: string;
@@ -63,4 +61,8 @@ export interface ProductStorageGroupItem {
   item_wide: string;
   item_large: string;
   item_higth: string;
+
+  // Propiedad exclusiva del group item.
+  PhisicalStock: string;
+  option_id: string;
 }

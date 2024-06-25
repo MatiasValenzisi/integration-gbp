@@ -217,7 +217,7 @@ export class Xml2jsService {
     if (!objectData || !objectData.NewDataSet || !objectData.NewDataSet.Table) {
       throw new Error(`objectData | Formato de datos incorrecto`);
     }
-
+  
     return objectData.NewDataSet.Table
     .map(item => ({
       item_id: item.item_id || '',
@@ -271,9 +271,7 @@ export class Xml2jsService {
       item_disabledInBalance: item.item_disabledInBalance || '',
       mu_id: item.mu_id || '',
       stock: item.stock || '',
-      PhisicalStock: item.PhisicalStock || '',
       tax_id: item.tax_id || '',
-      option_id: item.option_id || '',
       tax_percentage: item.tax_percentage || '',
       tax_id_II: item.tax_id_II || '',
       tax_percentage_II: item.tax_percentage_II || '',
@@ -283,6 +281,9 @@ export class Xml2jsService {
       item_wide: item.item_wide || '',
       item_large: item.item_large || '',
       item_higth: item.item_higth || '',
+      
+      PhisicalStock: item.PhisicalStock || '',
+      option_id: item.option_id || '',
     }));
   }
 

@@ -7,6 +7,7 @@ import { BrandItem } from '../interfaces/brand-Item.interface';
 import * as uuidValidate from 'uuid-validate';
 import { ProductItem } from '../interfaces/product-Item.interface';
 import { ProductStorageGroupItem } from '../interfaces/product-storage-group-Item.interface';
+import { ProductCombinedItem } from '../interfaces/product-combined-item.interface';
 
 @Injectable()
 export class NucleoService {
@@ -161,5 +162,20 @@ export class NucleoService {
     } catch (error) {
       throw new Error(`getAllProductsStorageGroup - service | ${error.message} `);
     }
+  }
+
+  async combineAndUpdatetAllProducts(): Promise<ProductCombinedItem[]> {
+ 
+    const products: ProductItem[] = await this.getAllProducts();
+    const productsStorageGroup: ProductStorageGroupItem[] = await this.getAllProductsStorageGroup();
+    const updatedProducts: ProductCombinedItem[] = products.map(product => {      
+      const matchingProduct: ProductStorageGroupItem = productsStorageGroup.find(storageProduct => storageProduct.item_id == product.item_id);      
+      if (matchingProduct) {        
+        return { ...matchingProduct, PhisicalStock: matchingProduct.PhisicalStock,option_id: matchingProduct.option_id };
+      } else {
+        return { ...product, PhisicalStock: "", option_id: "" };
+      }
+    });
+    return updatedProducts;
   }
 }
