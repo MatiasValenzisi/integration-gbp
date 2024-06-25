@@ -5,6 +5,7 @@ import { CredentialService } from './credential.service';
 import { LoginResponse } from '../interfaces/login-response.interface';
 import { BrandItem } from '../interfaces/brand-Item.interface';
 import * as uuidValidate from 'uuid-validate';
+import { ProductItem } from '../interfaces/product-Item.interface';
 
 @Injectable()
 export class NucleoService {
@@ -26,7 +27,7 @@ export class NucleoService {
         <wsBasicQueryHeader xmlns="http://microsoft.com/webservices/">
           <pUsername>${this.credentialService.userName}</pUsername>
           <pPassword>${this.credentialService.password}</pPassword>
-          <pCompany>${this.credentialService.company}</pCompany>
+          <pCompany>${this.credentialService.companyId}</pCompany>
           <pWebWervice>${this.credentialService.webService}</pWebWervice>
           <pAuthenticatedToken>${this.credentialService.authenticatedToken}</pAuthenticatedToken>
         </wsBasicQueryHeader>
@@ -66,7 +67,7 @@ export class NucleoService {
         <wsBasicQueryHeader xmlns="http://microsoft.com/webservices/">
           <pUsername>${this.credentialService.userName}</pUsername>
           <pPassword>${this.credentialService.password}</pPassword>
-          <pCompany>${this.credentialService.company}</pCompany>
+          <pCompany>${this.credentialService.companyId}</pCompany>
           <pWebWervice>${this.credentialService.webService}</pWebWervice>
           <pAuthenticatedToken>${token}</pAuthenticatedToken>
         </wsBasicQueryHeader>
@@ -88,9 +89,9 @@ export class NucleoService {
     }
   }
 
-  async getAllProductsWithStock(): Promise<any> {
+  async getAllProducts(): Promise<ProductItem[]> {
 
-    const token = await this.authenticate();
+    const token: string = await this.authenticate();
 
     // Soap 1.2
     const soapRequestBody = `<?xml version="1.0" encoding="utf-8"?>
@@ -101,7 +102,7 @@ export class NucleoService {
         <wsBasicQueryHeader xmlns="http://microsoft.com/webservices/">
           <pUsername>${this.credentialService.userName}</pUsername>
           <pPassword>${this.credentialService.password}</pPassword>
-          <pCompany>${this.credentialService.company}</pCompany>
+          <pCompany>${this.credentialService.companyId}</pCompany>
           <pWebWervice>${this.credentialService.webService}</pWebWervice>
           <pAuthenticatedToken>${token}</pAuthenticatedToken>
         </wsBasicQueryHeader>
@@ -115,7 +116,7 @@ export class NucleoService {
 
       const soapAction: string = 'http://microsoft.com/webservices/wsFullJaus_Item_funGetXMLData';
       const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);          
-      const parseResponseData = await this.xml2jsService.parseProductsWithStockSoapResponse(soapResponse); 
+      const parseResponseData = await this.xml2jsService.parseProductsSoapResponse(soapResponse); 
       return parseResponseData;
 
     } catch (error) {
@@ -123,10 +124,9 @@ export class NucleoService {
     }
   }
 
-  async getAllProductsWithStockPaginated(pageNumber: number): Promise<any> {
+  async getAllProductsStorageGroup(): Promise<any> {
 
     const token: string = await this.authenticate();
-    const pageSize: string = "500";
 
     // Soap 1.2
     const soapRequestBody = `<?xml version="1.0" encoding="utf-8"?>
@@ -137,32 +137,28 @@ export class NucleoService {
         <wsBasicQueryHeader xmlns="http://microsoft.com/webservices/">
           <pUsername>${this.credentialService.userName}</pUsername>
           <pPassword>${this.credentialService.password}</pPassword>
-          <pCompany>${this.credentialService.company}</pCompany>
-          <pWebService>${this.credentialService.webService}</pWebService>
+          <pCompany>${this.credentialService.companyId}</pCompany>
+          <pWebWervice>${this.credentialService.webService}</pWebWervice>
           <pAuthenticatedToken>${token}</pAuthenticatedToken>
         </wsBasicQueryHeader>
       </soap12:Header>
       <soap12:Body>
-        <wsFullJaus_Item_funGetXMLData_Paginated xmlns="http://microsoft.com/webservices/">
-          <intPageNumber>${pageNumber}</intPageNumber>
-          <intPageSize>${pageSize}</intPageSize>
-        </wsFullJaus_Item_funGetXMLData_Paginated>
+        <Item_funGetXMLDataByStorageGroup xmlns="http://microsoft.com/webservices/">
+          <intCompId>${this.credentialService.companyId}</intCompId>
+          <intStorId>${this.credentialService.storageGroup}</intStorId>
+        </Item_funGetXMLDataByStorageGroup>
       </soap12:Body>
     </soap12:Envelope>`;
 
     try {
 
-      const soapAction: string = 'http://microsoft.com/webservices/wsFullJaus_Item_funGetXMLData_Paginated';
-      const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);          
-      //const parseResponseData = await this.xml2jsService.parseProductsWithStockPaginatedSoapResponse(soapResponse); 
-      //return parseResponseData;
-
-      console.log(soapResponse); // temporal.
-      return null; // temporal.
+      const soapAction: string = 'http://microsoft.com/webservices/Item_funGetXMLDataByStorageGroup';
+      const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);        
+      const parseResponseData = await this.xml2jsService.parseProductsStorageGroupSoapResponse(soapResponse); 
+      return parseResponseData;
 
     } catch (error) {
-      throw new Error(`getAllProducts - service | Error al obtener los productos | ${error.message} `);
+      throw new Error(`getAllProducts - service | ${error.message} `);
     }
   }
-
 }

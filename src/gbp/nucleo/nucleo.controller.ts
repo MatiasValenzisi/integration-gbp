@@ -1,6 +1,9 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { NucleoService } from './services/nucleo.service';
+import { ProductItem } from './interfaces/product-Item.interface';
+import { ProductStorageGroupItem } from './interfaces/product-storage-group-Item.interface';
+import { BrandItem } from './interfaces/brand-Item.interface';
 
 @Controller('nucleo')
 export class NucleoController {
@@ -20,7 +23,7 @@ export class NucleoController {
   @Get('brands')
   async getAllBrands(@Res() res: Response) {
     try {      
-      const brands = await this.nucleoService.getAllBrands();
+      const brands: BrandItem[] = await this.nucleoService.getAllBrands();
       return res.status(200).json(brands);
     } catch (error) {
       res.status(500).json({ msg: `getAllBrands | Error al obtener las marcas | ${error}` });
@@ -28,27 +31,28 @@ export class NucleoController {
   }
 
   @Get('products')
-  async getAllProductsWithStock(@Res() res: Response) {
+  async getAllProducts(@Res() res: Response) {
     try {      
-      const products = await this.nucleoService.getAllProductsWithStock();
-      //return res.status(200).json(products);
-      
-      const limitedProducts = products.slice(0, 500); // Demostración de los primeros 500 productos. // Temporal.
-      return res.status(200).json(limitedProducts); // Temporal.
+      const products: ProductItem[] = await this.nucleoService.getAllProducts(); 
+      console.log('Cantidad de productos: ' + products.length);
+      const limitedProducts = products.slice(0, 500); // Mostrar los primeros 500 productos.
+      return res.status(200).json(limitedProducts);
 
     } catch (error) {
-      res.status(500).json({ msg: `getAllProductsWithStock - controller | Error al obtener los productos | ${error.message}` });
+      res.status(500).json({ msg: `getAllProducts - controller | Error al obtener los productos | ${error.message}` });
     }
   }
 
-  @Get('products/paginated/:pageNumber')
-  async getAllProductsWithStockPaginated(@Res() res: Response, @Param('pageNumber', ParseIntPipe ) pageNumber: number) {
+  @Get('products/storage/group')
+  async getAllProductsStorageGroup(@Res() res: Response) {
     try {      
-      const productsPaginated = await this.nucleoService.getAllProductsWithStockPaginated(pageNumber);
-      return res.status(200).json('productsPaginated');
+      const products: ProductStorageGroupItem[] = await this.nucleoService.getAllProductsStorageGroup(); 
+      console.log('Cantidad de productos: ' + products.length);
+      const limitedProducts = products.slice(0, 500); // Mostrar los primeros 500 productos.
+      return res.status(200).json(limitedProducts);
+
     } catch (error) {
-      res.status(500).json({ msg: `getAllProductsWithStockPaginated - controller | Error al obtener los productos | ${error.message}` });
+      res.status(500).json({ msg: `getAllProductsStorageGroup - controller | Error al obtener los productos | ${error.message}` });
     }
   }
-
 }

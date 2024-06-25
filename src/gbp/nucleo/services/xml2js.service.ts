@@ -5,6 +5,8 @@ import { BrandsResponse } from '../interfaces/brands-response.interface';
 import { ProductsResponse } from '../interfaces/products-response.interface';
 import { BrandItem } from '../interfaces/brand-Item.interface';
 import { ProductItem } from '../interfaces/product-Item.interface';
+import { ProductsStorageGroupResponse } from '../interfaces/products-storage-group-response.interface';
+import { ProductStorageGroupItem } from '../interfaces/product-storage-group-Item.interface';
 
 @Injectable()
 export class Xml2jsService {
@@ -26,6 +28,10 @@ export class Xml2jsService {
     return this.parseXml<ProductsResponse>(xmlString, 'xmlToObjectProductsResponse');
   }
 
+  async xmlToObjectProductsStorageGroupResponse(xmlString: string): Promise<ProductsStorageGroupResponse> {
+    return this.parseXml<ProductsStorageGroupResponse>(xmlString, 'xmlToObjectProductsStorageGroupResponse');
+  }
+
   async parseBrandsSoapResponse(soapResponse: string): Promise<BrandItem[]> {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);
@@ -37,25 +43,25 @@ export class Xml2jsService {
     }
   }
 
-  async parseProductsWithStockSoapResponse(soapResponse: string): Promise<ProductItem[]> {
+  async parseProductsSoapResponse(soapResponse: string): Promise<ProductItem[]> {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);
       const xmlData = this.extractXmlProductsData(soapBody);
       const objectData: ProductsResponse = await this.xmlToObjectProductsResponse(xmlData);
       return this.transformProductItem(objectData);
     } catch (error) {
-      throw new Error(`parseProductsWithStockSoapResponse | ${error.message}`);
+      throw new Error(`parseProductsSoapResponse | ${error.message}`);
     }
   }
 
-  async parseProductsWithStockPaginatedSoapResponse(soapResponse: string): Promise<ProductItem[]> {
+  async parseProductsStorageGroupSoapResponse(soapResponse: string): Promise<ProductStorageGroupItem[]> {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);
-      const xmlData = this.extractXmlProductsPaginatedData(soapBody);
-      const objectData: ProductsResponse = await this.xmlToObjectProductsResponse(xmlData);
-      return this.transformProductItem(objectData);
+      const xmlData = this.extractXmlProductsStorageGroupData(soapBody);
+      const objectData: ProductsStorageGroupResponse = await this.xmlToObjectProductsStorageGroupResponse(xmlData);
+      return this.transformProductStorageGroupItem(objectData);
     } catch (error) {
-      throw new Error(`parseProductsWithStockPaginatedSoapResponse | ${error.message}`);
+      throw new Error(`parseProductsStorageGroupSoapResponse | ${error.message}`);
     }
   }
 
@@ -107,13 +113,13 @@ export class Xml2jsService {
     return wsFullJaus_Item_funGetXMLDataResult;
   }
 
-  private extractXmlProductsPaginatedData(soapBody: any): string {
+  private extractXmlProductsStorageGroupData(soapBody: any): string {
 
-    const wsFullJaus_Item_funGetXMLData_PaginatedResult: string = soapBody.wsFullJaus_Item_funGetXMLData_PaginatedResponse.wsFullJaus_Item_funGetXMLData_PaginatedResult;
-    if (!wsFullJaus_Item_funGetXMLData_PaginatedResult) {
-      throw new Error(`extractXmlData | No se encontró wsFullJaus_Item_funGetXMLData_PaginatedResult en el cuerpo SOAP`);
+    const wsFullJaus_Item_funGetXMLDataResult: string = soapBody.Item_funGetXMLDataByStorageGroupResponse.Item_funGetXMLDataByStorageGroupResult;
+    if (!wsFullJaus_Item_funGetXMLDataResult) {
+      throw new Error(`extractXmlData | No se encontró wsFullJaus_Item_funGetXMLDataResult en el cuerpo SOAP`);
     }
-    return wsFullJaus_Item_funGetXMLData_PaginatedResult;
+    return wsFullJaus_Item_funGetXMLDataResult;
   }
 
   private transformBrandItem(objectData: BrandsResponse): BrandItem[] {
@@ -135,7 +141,6 @@ export class Xml2jsService {
     }
 
     return objectData.NewDataSet.Table
-    .filter(item => Number(item.stock) > 0)
     .map(item => (
       {
         item_id: item.item_id || '',
@@ -205,6 +210,80 @@ export class Xml2jsService {
         brand_desc: item.brand_desc || ''
       }
     ));
+  }
+
+  private transformProductStorageGroupItem(objectData: ProductsStorageGroupResponse): ProductStorageGroupItem[] {
+
+    if (!objectData || !objectData.NewDataSet || !objectData.NewDataSet.Table) {
+      throw new Error(`objectData | Formato de datos incorrecto`);
+    }
+
+    return objectData.NewDataSet.Table
+    .map(item => ({
+      item_id: item.item_id || '',
+      item_code: item.item_code || '',
+      item_desc: item.item_desc || '',
+      item_detail: item.item_detail || '',
+      item_vendorCode: item.item_vendorCode || '',
+      cat_id: item.cat_id || '',
+      subcat_id: item.subcat_id || '',
+      brand_id: item.brand_id || '',
+      pres_id: item.pres_id || '',
+      item_upb: item.item_upb || '',
+      item_upp: item.item_upp || '',
+      item_cantMin: item.item_cantMin || '',
+      item_cantOpt: item.item_cantOpt || '',
+      item_mult: item.item_mult || '',
+      item_commission: item.item_commission || '',
+      item_guarantee: item.item_guarantee || '',
+      item_expser: item.item_expser || '',
+      item_made: item.item_made || '',
+      item_web: item.item_web || '',
+      item_annotation: item.item_annotation || '',
+      item_annotation1: item.item_annotation1 || '',
+      item_annotation2: item.item_annotation2 || '',
+      item_newness: item.item_newness || '',
+      item_liquidation: item.item_liquidation || '',
+      item_withDecimal: item.item_withDecimal || '',
+      supp_id: item.supp_id || '',
+      item_qtyMin1: item.item_qtyMin1 || '',
+      item_qtyMin2: item.item_qtyMin2 || '',
+      item_qtyMin3: item.item_qtyMin3 || '',
+      item_markup_1: item.item_markup_1 || '',
+      item_markup_2: item.item_markup_2 || '',
+      item_markup_3: item.item_markup_3 || '',
+      item_markup_4: item.item_markup_4 || '',
+      item_markup_5: item.item_markup_5 || '',
+      item_markup_6: item.item_markup_6 || '',
+      item_markup_7: item.item_markup_7 || '',
+      item_markup_8: item.item_markup_8 || '',
+      item_markup_9: item.item_markup_9 || '',
+      item_markup_10: item.item_markup_10 || '',
+      item_markup_11: item.item_markup_11 || '',
+      item_markup_12: item.item_markup_12 || '',
+      item_markup_13: item.item_markup_13 || '',
+      item_markup_14: item.item_markup_14 || '',
+      item_markup_15: item.item_markup_15 || '',
+      item_markup_16: item.item_markup_16 || '',
+      item_weight: item.item_weight || '',
+      item_not4Sale: item.item_not4Sale || '',
+      item_disabled: item.item_disabled || '',
+      item_disabledInBalance: item.item_disabledInBalance || '',
+      mu_id: item.mu_id || '',
+      stock: item.stock || '',
+      PhisicalStock: item.PhisicalStock || '',
+      tax_id: item.tax_id || '',
+      option_id: item.option_id || '',
+      tax_percentage: item.tax_percentage || '',
+      tax_id_II: item.tax_id_II || '',
+      tax_percentage_II: item.tax_percentage_II || '',
+      imageExisting: item.imageExisting || '',
+      subcataux_id: item.subcataux_id || '',
+      item_WebSite_desc: item.item_WebSite_desc || '',
+      item_wide: item.item_wide || '',
+      item_large: item.item_large || '',
+      item_higth: item.item_higth || '',
+    }));
   }
 
 }
