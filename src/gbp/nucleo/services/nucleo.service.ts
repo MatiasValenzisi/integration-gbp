@@ -8,7 +8,6 @@ import * as uuidValidate from 'uuid-validate';
 import { ProductItem } from '../interfaces/product-Item.interface';
 import { ProductStorageGroupItem } from '../interfaces/product-storage-group-Item.interface';
 import { ProductCombinedItem } from '../interfaces/product-combined-item.interface';
-import { ImageItem } from '../interfaces/image-item';
 
 @Injectable()
 export class NucleoService {
@@ -237,14 +236,13 @@ export class NucleoService {
     const products: ProductCombinedItem[] = await this.getUpdatedProductsInStock();    
     const limitedProducts = products.slice(0, 10);
     let arrayPruebas = [];
-  
+
     for (const element of limitedProducts) {      
       const imagePrueba = await this.getImageById(Number(element.item_id));
       arrayPruebas.push(imagePrueba);
     }
-    
-    return arrayPruebas;
-    
+
+    return arrayPruebas;    
   }
 
 }
