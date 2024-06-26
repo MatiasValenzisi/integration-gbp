@@ -62,7 +62,7 @@ export interface ProductStorageGroupItem
   item_large: string;
   item_higth: string;
 
-  // Propiedad exclusiva del group item.
+  // Propiedades exclusiva del group item.
   PhisicalStock: string;
   option_id: string;
 }

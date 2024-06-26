@@ -164,6 +164,13 @@ export class NucleoService {
     }
   }
 
+  async getUpdatedProductsInStock(): Promise<ProductCombinedItem[]> {
+
+    const updatedProducts: ProductCombinedItem[] = await this.combineAndUpdatetAllProducts();
+    const stockedProducts: ProductCombinedItem[] = this.getStockedProducts(updatedProducts);
+    return stockedProducts;
+  }
+
   async combineAndUpdatetAllProducts(): Promise<ProductCombinedItem[]> {
  
     const products: ProductItem[] = await this.getAllProducts();
@@ -176,6 +183,17 @@ export class NucleoService {
         return { ...product, PhisicalStock: "", option_id: "" };
       }
     });
+
+    console.log("combineAndUpdatetAllProducts: " + updatedProducts.length);
+
     return updatedProducts;
   }
+
+  getStockedProducts(products: ProductCombinedItem[]): ProductCombinedItem[] { 
+    const stockedProducts = products.filter(product => {
+      return product.stock !== "" && Number(product.stock) !== 0
+    });
+    return stockedProducts;
+  }
+
 }

@@ -4,6 +4,7 @@ import { NucleoService } from './services/nucleo.service';
 import { ProductItem } from './interfaces/product-Item.interface';
 import { ProductStorageGroupItem } from './interfaces/product-storage-group-Item.interface';
 import { BrandItem } from './interfaces/brand-Item.interface';
+import { ProductCombinedItem } from './interfaces/product-combined-item.interface';
 
 @Controller('nucleo')
 export class NucleoController {
@@ -34,7 +35,7 @@ export class NucleoController {
   async getAllProducts(@Res() res: Response) {
     try {      
       const products: ProductItem[] = await this.nucleoService.getAllProducts(); 
-      console.log('Cantidad de productos: ' + products.length);
+      console.log('Cantidad de productos totales: ' + products.length);
       const limitedProducts = products.slice(0, 500); // Mostrar los primeros 500 productos.
       return res.status(200).json(limitedProducts);
 
@@ -47,12 +48,25 @@ export class NucleoController {
   async getAllProductsStorageGroup(@Res() res: Response) {
     try {      
       const products: ProductStorageGroupItem[] = await this.nucleoService.getAllProductsStorageGroup(); 
-      console.log('Cantidad de productos: ' + products.length);
+      console.log('Cantidad de productos de un grupo: ' + products.length);
       const limitedProducts = products.slice(0, 500); // Mostrar los primeros 500 productos.
       return res.status(200).json(limitedProducts);
 
     } catch (error) {
-      res.status(500).json({ msg: `getAllProductsStorageGroup - controller | Error al obtener los productos | ${error.message}` });
+      res.status(500).json({ msg: `getAllProductsStorageGroup - controller | Error al obtener los productos de un grupo | ${error.message}` });
+    }
+  }
+
+  @Get('products/updated/instock')
+  async getUpdatedProductsInStock(@Res() res: Response) {
+    try {      
+      const products: ProductCombinedItem[] = await this.nucleoService.getUpdatedProductsInStock(); 
+      console.log('Cantidad de productos actualizados en stock: ' + products.length);
+      const limitedProducts = products.slice(0, 500); // Mostrar los primeros 500 productos.
+      return res.status(200).json(limitedProducts);
+
+    } catch (error) {
+      res.status(500).json({ msg: `getUpdatedProductsInStock - controller | Error al obtener los productos en stock | ${error.message}` });
     }
   }
 }
