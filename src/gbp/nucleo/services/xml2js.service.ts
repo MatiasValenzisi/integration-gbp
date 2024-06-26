@@ -3,10 +3,12 @@ import { parseString, ParserOptions } from 'xml2js';
 import { LoginResponse } from '../interfaces/login-response.interface';
 import { BrandsResponse } from '../interfaces/brands-response.interface';
 import { ProductsResponse } from '../interfaces/products-response.interface';
-import { BrandItem } from '../interfaces/brand-Item.interface';
+import { BrandItem } from '../interfaces/brand-item.interface';
 import { ProductItem } from '../interfaces/product-Item.interface';
 import { ProductsStorageGroupResponse } from '../interfaces/products-storage-group-response.interface';
 import { ProductStorageGroupItem } from '../interfaces/product-storage-group-Item.interface';
+import { ImagesResponse } from '../interfaces/images-response.interface';
+import { ImageItem } from '../interfaces/image-item';
 
 @Injectable()
 export class Xml2jsService {
@@ -30,6 +32,10 @@ export class Xml2jsService {
 
   async xmlToObjectProductsStorageGroupResponse(xmlString: string): Promise<ProductsStorageGroupResponse> {
     return this.parseXml<ProductsStorageGroupResponse>(xmlString, 'xmlToObjectProductsStorageGroupResponse');
+  }
+
+  async xmlToObjectImageResponse(xmlString: string): Promise<ImagesResponse> {
+    return this.parseXml<ImagesResponse>(xmlString, 'xmlToObjectImageResponse');
   }
 
   async parseBrandsSoapResponse(soapResponse: string): Promise<BrandItem[]> {
@@ -62,6 +68,17 @@ export class Xml2jsService {
       return this.transformProductStorageGroupItem(objectData);
     } catch (error) {
       throw new Error(`parseProductsStorageGroupSoapResponse | ${error.message}`);
+    }
+  }
+
+  async parseImagesSoapResponse(soapResponse: string): Promise<ImageItem[]> {
+    try {
+      const soapBody = await this.extractSoapBody(soapResponse);      
+      const xmlData = this.extractXmlImageData(soapBody);    
+      const objectData: ImagesResponse = await this.xmlToObjectImageResponse(xmlData);
+      return this.transformImageItem(objectData);
+    } catch (error) {
+      throw new Error(`parseImagesSoapResponse | ${error.message}`);
     }
   }
 
@@ -99,7 +116,7 @@ export class Xml2jsService {
 
     const brand_funGetXMLDataResult: string = soapBody.Brand_funGetXMLDataResponse.Brand_funGetXMLDataResult;
     if (!brand_funGetXMLDataResult) {
-      throw new Error(`extractXmlData | No se encontró Brand_funGetXMLDataResult en el cuerpo SOAP`);
+      throw new Error(`extractXmlBrandsData | No se encontró Brand_funGetXMLDataResult en el cuerpo SOAP`);
     }
     return brand_funGetXMLDataResult;
   }
@@ -108,7 +125,7 @@ export class Xml2jsService {
 
     const wsFullJaus_Item_funGetXMLDataResult: string = soapBody.wsFullJaus_Item_funGetXMLDataResponse.wsFullJaus_Item_funGetXMLDataResult;
     if (!wsFullJaus_Item_funGetXMLDataResult) {
-      throw new Error(`extractXmlData | No se encontró wsFullJaus_Item_funGetXMLDataResult en el cuerpo SOAP`);
+      throw new Error(`extractXmlProductsData | No se encontró wsFullJaus_Item_funGetXMLDataResult en el cuerpo SOAP`);
     }
     return wsFullJaus_Item_funGetXMLDataResult;
   }
@@ -117,9 +134,18 @@ export class Xml2jsService {
 
     const wsFullJaus_Item_funGetXMLDataResult: string = soapBody.Item_funGetXMLDataByStorageGroupResponse.Item_funGetXMLDataByStorageGroupResult;
     if (!wsFullJaus_Item_funGetXMLDataResult) {
-      throw new Error(`extractXmlData | No se encontró wsFullJaus_Item_funGetXMLDataResult en el cuerpo SOAP`);
+      throw new Error(`extractXmlProductsStorageGroupData | No se encontró wsFullJaus_Item_funGetXMLDataResult en el cuerpo SOAP`);
     }
     return wsFullJaus_Item_funGetXMLDataResult;
+  }
+
+  private extractXmlImageData(soapBody: any): string {
+
+    const ItemImages_funGetXMLDataResult: string = soapBody.ItemImages_funGetXMLDataResponse.ItemImages_funGetXMLDataResult;
+    if (!ItemImages_funGetXMLDataResult) {
+      throw new Error(`extractXmlImageData | No se encontró ItemImages_funGetXMLDataResult en el cuerpo SOAP`);
+    }
+    return ItemImages_funGetXMLDataResult;
   }
 
   private transformBrandItem(objectData: BrandsResponse): BrandItem[] {
@@ -281,9 +307,27 @@ export class Xml2jsService {
       item_wide: item.item_wide || '',
       item_large: item.item_large || '',
       item_higth: item.item_higth || '',
-      
+
       PhisicalStock: item.PhisicalStock || '',
       option_id: item.option_id || '',
+    }));
+  }
+
+  private transformImageItem(objectData: ImagesResponse): ImageItem[]{
+    
+    if (!objectData || !objectData.NewDataSet || !objectData.NewDataSet.Table) {
+      throw new Error(`objectData | Formato de datos incorrecto`);
+    }
+
+    const tableData = Array.isArray(objectData.NewDataSet.Table)
+    ? objectData.NewDataSet.Table
+    : [objectData.NewDataSet.Table];
+
+    return tableData.map(item => ({
+        comp_id: item.comp_id,
+        item_id: item.item_id,
+        item_picture: item.item_picture,
+        Order: item.Order,
     }));
   }
 

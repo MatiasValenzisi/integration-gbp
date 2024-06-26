@@ -66,7 +66,6 @@ $ npm run start:dev
 - uuid-validate: Valida si un dato es un uuid. Versión ^0.0.3
 - xml2js: Convertidor de XML a JavaScript. Versión ^0.6.2
 
-
 ## Documentación
 
 - Nomenclatura - https://gist.github.com/WanerValencia/64bed91c288153b4aef10b57e98785e3

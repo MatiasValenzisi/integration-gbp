@@ -3,11 +3,12 @@ import { AxiosService } from './axios.service';
 import { Xml2jsService } from './xml2js.service';
 import { CredentialService } from './credential.service';
 import { LoginResponse } from '../interfaces/login-response.interface';
-import { BrandItem } from '../interfaces/brand-Item.interface';
+import { BrandItem } from '../interfaces/brand-item.interface';
 import * as uuidValidate from 'uuid-validate';
 import { ProductItem } from '../interfaces/product-Item.interface';
 import { ProductStorageGroupItem } from '../interfaces/product-storage-group-Item.interface';
 import { ProductCombinedItem } from '../interfaces/product-combined-item.interface';
+import { ImageItem } from '../interfaces/image-item';
 
 @Injectable()
 export class NucleoService {
@@ -171,7 +172,7 @@ export class NucleoService {
     return stockedProducts;
   }
 
-  async combineAndUpdatetAllProducts(): Promise<ProductCombinedItem[]> {
+  private async combineAndUpdatetAllProducts(): Promise<ProductCombinedItem[]> {
  
     const products: ProductItem[] = await this.getAllProducts();
     const productsStorageGroup: ProductStorageGroupItem[] = await this.getAllProductsStorageGroup();
@@ -184,16 +185,66 @@ export class NucleoService {
       }
     });
 
-    console.log("combineAndUpdatetAllProducts: " + updatedProducts.length);
-
     return updatedProducts;
   }
 
-  getStockedProducts(products: ProductCombinedItem[]): ProductCombinedItem[] { 
-    const stockedProducts = products.filter(product => {
+  private getStockedProducts(products: ProductCombinedItem[]): ProductCombinedItem[] { 
+    const stockedProducts: ProductCombinedItem[] = products.filter(product => {
       return product.stock !== "" && Number(product.stock) !== 0
     });
     return stockedProducts;
+  }
+
+  async getImageById(id: Number): Promise<any[]> {
+
+    const token: string = await this.authenticate(); // temporal (ver como utilizarlo);
+
+    // Soap 1.2
+    const soapRequestBody = `<?xml version="1.0" encoding="utf-8"?>
+    <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                     xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+      <soap12:Header>
+        <wsBasicQueryHeader xmlns="http://microsoft.com/webservices/">
+          <pUsername>${this.credentialService.userName}</pUsername>
+          <pPassword>${this.credentialService.password}</pPassword>
+          <pCompany>${this.credentialService.companyId}</pCompany>
+          <pWebWervice>${this.credentialService.webService}</pWebWervice>
+          <pAuthenticatedToken>${token}</pAuthenticatedToken>
+        </wsBasicQueryHeader>
+      </soap12:Header>
+      <soap12:Body>
+        <ItemImages_funGetXMLData xmlns="http://microsoft.com/webservices/">
+          <intItemId>${id}</intItemId>
+        </ItemImages_funGetXMLData>
+      </soap12:Body>
+    </soap12:Envelope>`;
+
+    try {
+
+      const soapAction: string = 'http://microsoft.com/webservices/ItemImages_funGetXMLData';
+      const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);        
+      const parseResponseData = await this.xml2jsService.parseImagesSoapResponse(soapResponse); 
+      return parseResponseData;
+
+    } catch (error) {
+      throw new Error(`getImageById - service | ${error.message} `);
+    }
+  }
+
+  async getProductsWithImages(): Promise<any[]> {
+    
+    const products: ProductCombinedItem[] = await this.getUpdatedProductsInStock();    
+    const limitedProducts = products.slice(0, 10);
+    let arrayPruebas = [];
+  
+    for (const element of limitedProducts) {      
+      const imagePrueba = await this.getImageById(Number(element.item_id));
+      arrayPruebas.push(imagePrueba);
+    }
+    
+    return arrayPruebas;
+    
   }
 
 }

@@ -1,4 +1,3 @@
-// Soap 1.2
 export interface BrandsResponse {
   NewDataSet: {
     Table: {
