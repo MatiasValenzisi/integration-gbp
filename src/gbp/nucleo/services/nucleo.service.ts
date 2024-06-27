@@ -274,12 +274,13 @@ export class NucleoService {
     try {
       
       const products: ProductCombinedItem[] = await this.getUpdatedProductsInStock();    
-      //const limitedProducts = products.slice(0, 5000);
+      const limitedProducts = products.slice(0, 1000);
       const productsStructured = [];
 
       try {      
   
-        for (const product of products) {    
+        for (const product of limitedProducts) {    
+          console.log(`Se esta buscando la imagen con id: ${product.item_id}...`);
           const imagesProduct:ImageItem[] = await this.getImagesByProductId(Number(product.item_id));
           const productStructuredItem: ProductStructuredItem = this.xml2jsService.parseProductStructuredItem(product, imagesProduct);
           productsStructured.push(productStructuredItem);
@@ -288,7 +289,7 @@ export class NucleoService {
         return productsStructured;
       
       } catch (error) {  
-        console.log(`Se ha obtenido en [getImagesByProductId], ${productsStructured.length} productos.`);
+        console.log(`Se han obtenido en [getImagesByProductId], ${productsStructured.length} productos antes de tirar error.`);
         throw new Error(`getProductsStructuredWithImages - service | getImagesByProductId | ${error.message} `);
       }
       
