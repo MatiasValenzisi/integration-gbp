@@ -6,7 +6,7 @@ import { ProductsResponse } from '../interfaces/products-response.interface';
 import { BrandItem } from '../interfaces/brand-item.interface';
 import { ProductItem } from '../interfaces/product-Item.interface';
 import { ProductsStorageGroupResponse } from '../interfaces/products-storage-group-response.interface';
-import { ProductStorageGroupItem } from '../interfaces/product-storage-group-Item.interface';
+import { ProductStorageGroupItem } from '../interfaces/product-storage-group-item.interface';
 import { ImagesResponse } from '../interfaces/images-response.interface';
 import { ImageItem } from '../interfaces/image-item';
 

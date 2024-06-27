@@ -6,7 +6,7 @@ import { LoginResponse } from '../interfaces/login-response.interface';
 import { BrandItem } from '../interfaces/brand-item.interface';
 import * as uuidValidate from 'uuid-validate';
 import { ProductItem } from '../interfaces/product-Item.interface';
-import { ProductStorageGroupItem } from '../interfaces/product-storage-group-Item.interface';
+import { ProductStorageGroupItem } from '../interfaces/product-storage-group-item.interface';
 import { ProductCombinedItem } from '../interfaces/product-combined-item.interface';
 
 @Injectable()

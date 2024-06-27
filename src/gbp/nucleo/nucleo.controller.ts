@@ -2,7 +2,7 @@ import { Controller, Get, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { NucleoService } from './services/nucleo.service';
 import { ProductItem } from './interfaces/product-Item.interface';
-import { ProductStorageGroupItem } from './interfaces/product-storage-group-Item.interface';
+import { ProductStorageGroupItem } from './interfaces/product-storage-group-item.interface';
 import { BrandItem } from './interfaces/brand-item.interface';
 
 @Controller('nucleo')
