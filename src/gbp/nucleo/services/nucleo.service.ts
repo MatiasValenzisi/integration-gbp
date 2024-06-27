@@ -8,9 +8,14 @@ import * as uuidValidate from 'uuid-validate';
 import { ProductItem } from '../interfaces/product-Item.interface';
 import { ProductStorageGroupItem } from '../interfaces/product-storage-group-item.interface';
 import { ProductCombinedItem } from '../interfaces/product-combined-item.interface';
+import { ProductStructuredItem } from '../interfaces/product-structured-item.interface';
+import { ImageItem } from '../interfaces/image-item';
 
 @Injectable()
 export class NucleoService {
+
+  private token: string;
+  private tokenExpiry: Date;
   
   constructor(
     private readonly credentialService: CredentialService,
@@ -18,7 +23,11 @@ export class NucleoService {
     private readonly xml2jsService: Xml2jsService
   ) {}
 
-  async authenticate(): Promise<string> {    
+  async authenticate(): Promise<string> {   
+    
+    if (this.token && new Date() < this.tokenExpiry) {
+      return this.token;
+    }
 
     // Soap 1.2
     const soapRequestBody = `<?xml version="1.0" encoding="utf-8"?>
@@ -46,13 +55,17 @@ export class NucleoService {
       const response: string = jsonResponse["soap:Envelope"]["soap:Body"]["AuthenticateUserResponse"]["AuthenticateUserResult"];
       
       if (!uuidValidate(response)){
-        throw new Error(`authenticate | ${response}`);
+        throw new Error(`uuidValidate | authenticate - service | ${response}`);
       }
+
+      // Actualizar el atributo token del servicio.
+      this.token = response;
+      this.tokenExpiry = new Date(new Date().getTime() + 2 * 60 * 1000); // token es valido por dos minutos.
 
       return response;
 
     } catch (error) {
-      throw new Error(`authenticate | ${error}`);
+      throw new Error(`authenticate - service | ${error}`);
     }
   }
 
@@ -83,7 +96,8 @@ export class NucleoService {
 
       const soapAction: string = 'http://microsoft.com/webservices/Brand_funGetXMLData';
       const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);      
-      const parseResponseData = await this.xml2jsService.parseBrandsSoapResponse(soapResponse);       
+      const parseResponseData = await this.xml2jsService.parseBrandsSoapResponse(soapResponse);
+      console.log(`Se ha obtenido en [getAllBrands], ${parseResponseData.length} marcas.`);
       return parseResponseData;
 
     } catch (error) {
@@ -118,7 +132,8 @@ export class NucleoService {
 
       const soapAction: string = 'http://microsoft.com/webservices/wsFullJaus_Item_funGetXMLData';
       const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);          
-      const parseResponseData = await this.xml2jsService.parseProductsSoapResponse(soapResponse); 
+      const parseResponseData = await this.xml2jsService.parseProductsSoapResponse(soapResponse);
+      console.log(`Se ha obtenido en [getAllProducts], ${parseResponseData.length} productos.`);
       return parseResponseData;
 
     } catch (error) {
@@ -156,7 +171,8 @@ export class NucleoService {
 
       const soapAction: string = 'http://microsoft.com/webservices/Item_funGetXMLDataByStorageGroup';
       const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);        
-      const parseResponseData = await this.xml2jsService.parseProductsStorageGroupSoapResponse(soapResponse); 
+      const parseResponseData = await this.xml2jsService.parseProductsStorageGroupSoapResponse(soapResponse);
+      console.log(`Se ha obtenido en [getAllProductsStorageGroup], ${parseResponseData.length} productos.`);
       return parseResponseData;
 
     } catch (error) {
@@ -165,36 +181,57 @@ export class NucleoService {
   }
 
   async getUpdatedProductsInStock(): Promise<ProductCombinedItem[]> {
-
-    const updatedProducts: ProductCombinedItem[] = await this.combineAndUpdatetAllProducts();
-    const stockedProducts: ProductCombinedItem[] = this.getStockedProducts(updatedProducts);
-    return stockedProducts;
+    try {      
+      const updatedProducts: ProductCombinedItem[] = await this.combineAndUpdatetAllProducts();
+      const stockedProducts: ProductCombinedItem[] = this.getStockedProducts(updatedProducts);
+      return stockedProducts;
+    } catch (error) {
+      throw new Error(`getUpdatedProductsInStock - service | ${error.message} `); 
+    }
   }
 
   private async combineAndUpdatetAllProducts(): Promise<ProductCombinedItem[]> {
- 
-    const products: ProductItem[] = await this.getAllProducts();
-    const productsStorageGroup: ProductStorageGroupItem[] = await this.getAllProductsStorageGroup();
-    const updatedProducts: ProductCombinedItem[] = products.map(product => {      
-      const matchingProduct: ProductStorageGroupItem = productsStorageGroup.find(storageProduct => storageProduct.item_id == product.item_id);      
-      if (matchingProduct) {        
-        return { ...matchingProduct, PhisicalStock: matchingProduct.PhisicalStock,option_id: matchingProduct.option_id };
-      } else {
-        return { ...product, PhisicalStock: "", option_id: "" };
-      }
-    });
+    
+    try {
+      const products: ProductItem[] = await this.getAllProducts();
+      const productsStorageGroup: ProductStorageGroupItem[] = await this.getAllProductsStorageGroup();
+  
+      const updatedProducts: ProductCombinedItem[] = products.map(product => {
+        const matchingProduct: ProductStorageGroupItem = productsStorageGroup.find(storageProduct => storageProduct.item_id == product.item_id);
+        if (matchingProduct) {
+          return { ...matchingProduct, PhisicalStock: matchingProduct.PhisicalStock, option_id: matchingProduct.option_id, item_volume: product.item_volume };
+        } else {
+          return { ...product, PhisicalStock: "", option_id: "", item_volume: product.item_volume };
+        }
+      });
+  
+      const nonMatchingProducts = productsStorageGroup.filter(storageProduct => !products.some(product => product.item_id === storageProduct.item_id))
+        .map(storageProduct => ({
+          ...storageProduct,
+          PhisicalStock: storageProduct.PhisicalStock,
+          option_id: storageProduct.option_id,
+          item_volume: "",
+        }));
+  
+      const finalProducts = [...updatedProducts, ...nonMatchingProducts];  
 
-    return updatedProducts;
+      console.log(`Se ha obtenido en [combineAndUpdatetAllProducts], ${finalProducts.length} productos.`);
+
+      return finalProducts;
+  
+    } catch (error) {
+      throw new Error(`combineAndUpdatetAllProducts - service | ${error.message}`);
+    }
   }
 
-  private getStockedProducts(products: ProductCombinedItem[]): ProductCombinedItem[] { 
+  private getStockedProducts(products: ProductCombinedItem[]): ProductCombinedItem[] {
     const stockedProducts: ProductCombinedItem[] = products.filter(product => {
       return product.stock !== "" && Number(product.stock) !== 0
     });
     return stockedProducts;
   }
 
-  async getImageById(id: Number): Promise<any[]> {
+  async getImagesByProductId(id: Number): Promise<ImageItem[]> {
 
     const token: string = await this.authenticate(); // temporal (ver como utilizarlo);
 
@@ -223,26 +260,40 @@ export class NucleoService {
 
       const soapAction: string = 'http://microsoft.com/webservices/ItemImages_funGetXMLData';
       const soapResponse = await this.axiosService.sendSoapPostRequest(soapRequestBody, soapAction);        
-      const parseResponseData = await this.xml2jsService.parseImagesSoapResponse(soapResponse); 
+      const parseResponseData = await this.xml2jsService.parseImagesSoapResponse(soapResponse);
+       
       return parseResponseData;
 
     } catch (error) {
-      throw new Error(`getImageById - service | ${error.message} `);
+      throw new Error(`getImagesByProductId - service | ${error.message} `);
     }
   }
 
-  async getProductsWithImages(): Promise<any[]> {
-    
-    const products: ProductCombinedItem[] = await this.getUpdatedProductsInStock();    
-    const limitedProducts = products.slice(0, 10);
-    let arrayPruebas = [];
+  async getProductsStructuredWithImages(): Promise<ProductStructuredItem[]> {
 
-    for (const element of limitedProducts) {      
-      const imagePrueba = await this.getImageById(Number(element.item_id));
-      arrayPruebas.push(imagePrueba);
-    }
+    try {
+      
+      const products: ProductCombinedItem[] = await this.getUpdatedProductsInStock();    
+      //const limitedProducts = products.slice(0, 5000);
+      const productsStructured = [];
 
-    return arrayPruebas;    
-  }
-
+      try {      
+  
+        for (const product of products) {    
+          const imagesProduct:ImageItem[] = await this.getImagesByProductId(Number(product.item_id));
+          const productStructuredItem: ProductStructuredItem = this.xml2jsService.parseProductStructuredItem(product, imagesProduct);
+          productsStructured.push(productStructuredItem);
+          console.log(`Se ha cargado el producto estructurado N°${productsStructured.length}.`);
+        }
+        return productsStructured;
+      
+      } catch (error) {  
+        console.log(`Se ha obtenido en [getImagesByProductId], ${productsStructured.length} productos.`);
+        throw new Error(`getProductsStructuredWithImages - service | getImagesByProductId | ${error.message} `);
+      }
+      
+    } catch (error) {
+      throw new Error(`getProductsStructuredWithImages - service | getUpdatedProductsInStock | ${error.message} `);
+    }  
+  }  
 }

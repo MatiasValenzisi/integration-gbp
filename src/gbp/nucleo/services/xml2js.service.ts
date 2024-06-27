@@ -9,6 +9,10 @@ import { ProductsStorageGroupResponse } from '../interfaces/products-storage-gro
 import { ProductStorageGroupItem } from '../interfaces/product-storage-group-item.interface';
 import { ImagesResponse } from '../interfaces/images-response.interface';
 import { ImageItem } from '../interfaces/image-item';
+import { ProductCombinedItem } from '../interfaces/product-combined-item.interface';
+import { ProductStructuredItem } from '../interfaces/product-structured-item.interface';
+import { SkuItem } from '../interfaces/sku-item.interface';
+import { FileItem } from '../interfaces/file-item.interface';
 
 @Injectable()
 export class Xml2jsService {
@@ -42,6 +46,11 @@ export class Xml2jsService {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);
       const xmlData = this.extractXmlBrandsData(soapBody);
+
+      if (xmlData == 'Not data found.'){
+        return [];
+      }
+
       const objectData: BrandsResponse = await this.xmlToObjectBrandResponse(xmlData);
       return this.transformBrandItem(objectData);
     } catch (error) {
@@ -53,6 +62,11 @@ export class Xml2jsService {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);
       const xmlData = this.extractXmlProductsData(soapBody);
+
+      if (xmlData == 'Not data found.'){
+        return [];
+      }
+
       const objectData: ProductsResponse = await this.xmlToObjectProductsResponse(xmlData);
       return this.transformProductItem(objectData);
     } catch (error) {
@@ -64,6 +78,11 @@ export class Xml2jsService {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);
       const xmlData = this.extractXmlProductsStorageGroupData(soapBody);
+
+      if (xmlData == 'Not data found.'){
+        return [];
+      }
+
       const objectData: ProductsStorageGroupResponse = await this.xmlToObjectProductsStorageGroupResponse(xmlData);
       return this.transformProductStorageGroupItem(objectData);
     } catch (error) {
@@ -75,6 +94,11 @@ export class Xml2jsService {
     try {
       const soapBody = await this.extractSoapBody(soapResponse);      
       const xmlData = this.extractXmlImageData(soapBody);    
+
+      if (xmlData == 'Not data found.'){
+        return [];
+      }
+
       const objectData: ImagesResponse = await this.xmlToObjectImageResponse(xmlData);
       return this.transformImageItem(objectData);
     } catch (error) {
@@ -329,6 +353,61 @@ export class Xml2jsService {
         item_picture: item.item_picture,
         Order: item.Order,
     }));
+  }
+
+  parseProductStructuredItem(productCombinedItem: ProductCombinedItem, imageItems: ImageItem[]): ProductStructuredItem{
+
+    const ImageItemMain: ImageItem = imageItems.find(item => item.Order === "-1");
+    
+    const file: FileItem | null = ImageItemMain 
+    ? {
+        file: `www.simulacion.url.s3.com/${ImageItemMain.item_id}_order_${ImageItemMain.Order}`,
+        order: Number(ImageItemMain.Order),
+        productId: ImageItemMain.item_id
+      } 
+    : null;
+    
+    const fileItems: FileItem[] = imageItems.length > 0 
+    ? imageItems.map(imageItem => ({
+        file: `www.simulacion.url.s3.com/${imageItem.item_id}_order_${imageItem.Order}`,
+        order: Number(imageItem.Order),
+        productId: imageItem.item_id
+      }))
+    : [];
+
+    const sku: SkuItem = {
+      eanCode: productCombinedItem.item_vendorCode,
+      referenceCode: productCombinedItem.item_code,
+      name: productCombinedItem.item_desc,
+      sizeWidth: Number(productCombinedItem.item_wide),
+      sizeHeight: Number(productCombinedItem.item_higth),
+      sizeLength: Number(productCombinedItem.item_large),
+      volumen: Number(productCombinedItem.item_volume),
+      weight: Number(productCombinedItem.item_weight),
+      active: (productCombinedItem.item_disabled == "true"),
+      stockInfinite: false,
+      stockTotal: 0,
+      stockCommited: 0,
+      stockSecurity: 0,
+      priceList: Number(productCombinedItem.item_upb),
+      priceCost: 0,
+      files: fileItems,
+    };
+
+    const productStructuredItem: ProductStructuredItem = {
+      externalId: productCombinedItem.item_id,
+      name: productCombinedItem.item_desc,
+      categoryId: productCombinedItem.cat_id,
+      brandId: productCombinedItem.brand_id,
+      factoryWarranty: productCombinedItem.item_guarantee,
+      description: `${productCombinedItem.item_annotation} ${productCombinedItem.item_annotation1} ${productCombinedItem.item_annotation2}`,
+      active: (productCombinedItem.item_disabled == "true"),
+      file: file,
+      skus: [sku]
+    };
+
+    return productStructuredItem;
+
   }
 
 }

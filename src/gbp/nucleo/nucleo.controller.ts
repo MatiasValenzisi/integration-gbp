@@ -34,7 +34,6 @@ export class NucleoController {
   async getAllProducts(@Res() res: Response) {
     try {      
       const products: ProductItem[] = await this.nucleoService.getAllProducts(); 
-      console.log('Cantidad de productos totales: ' + products.length);
       const limitedProducts = products.slice(0, 10); // Mostrar los primeros 10 productos.
       return res.status(200).json(limitedProducts);
 
@@ -47,7 +46,6 @@ export class NucleoController {
   async getAllProductsStorageGroup(@Res() res: Response) {
     try {      
       const products: ProductStorageGroupItem[] = await this.nucleoService.getAllProductsStorageGroup(); 
-      console.log('Cantidad de productos de un grupo: ' + products.length);
       const limitedProducts = products.slice(0, 10); // Mostrar los primeros 10 productos.
       return res.status(200).json(limitedProducts);
 
@@ -60,7 +58,6 @@ export class NucleoController {
   async getUpdatedProductsInStock(@Res() res: Response) {
     try {      
       const products = await this.nucleoService.getUpdatedProductsInStock(); 
-      console.log('Cantidad de productos actualizados en stock: ' + products.length);
       const limitedProducts = products.slice(0, 10); // Mostrar los primeros 10 productos.
       return res.status(200).json(limitedProducts);
 
@@ -69,16 +66,15 @@ export class NucleoController {
     }
   }
   
-  @Get('products/withimages')
-  async getProductsWithImages(@Res() res: Response) {
+  @Get('products/structured/withimages')
+  async getProductsStructuredWithImages(@Res() res: Response) {
     try {      
-      const products: any[] = await this.nucleoService.getProductsWithImages();
-      console.log('Cantidad de productos con imagenes: ' + products.length);
-      const limitedProducts = products.slice(0, 10); // Mostrar los primeros 10 productos.
+      const products: any[] = await this.nucleoService.getProductsStructuredWithImages();
+      const limitedProducts = products.slice(0, 100); // Mostrar los primeros 10 productos.
       return res.status(200).json(limitedProducts);
 
     } catch (error) {
-      res.status(500).json({ msg: `getProductsWithImages - controller | Error al obtener los productos en stock con imagenes | ${error.message}` });
+      res.status(500).json({ msg: `getProductsStructuredWithImages - controller | Error al obtener los productos en stock con imagenes | ${error.message}` });
     }
   }
 }
