@@ -7,6 +7,29 @@ export class AxiosService {
   
   constructor(private credentialService: CredentialService) {}
 
+  async sendSoapPostRequest(token: string, soapBody: string): Promise<any> {
+    return this.sendRequest('POST', '', this.buildSoapRequestBody(token, soapBody), 
+    { 'Content-Type': 'text/xml; charset=utf-8' });
+  }
+
+  buildSoapRequestBody(token: string, soapBody: string): string {
+    return `<?xml version="1.0" encoding="utf-8"?>
+      <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                       xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+        <soap12:Header>
+          <wsBasicQueryHeader xmlns="http://microsoft.com/webservices/">
+            <pUsername>${this.credentialService.userName}</pUsername>
+            <pPassword>${this.credentialService.password}</pPassword>
+            <pCompany>${this.credentialService.companyId}</pCompany>
+            <pWebWervice>${this.credentialService.webService}</pWebWervice>
+            <pAuthenticatedToken>${token}</pAuthenticatedToken>
+          </wsBasicQueryHeader>
+        </soap12:Header>
+        ${soapBody}
+      </soap12:Envelope>`;
+  }
+
   async sendRequest(method: Method, url: string, data: any = null, headers: any = {}, params: any = null): Promise<any> {
     
     try {      
@@ -27,11 +50,4 @@ export class AxiosService {
     }
   }
 
-  async sendSoapPostRequest(soapRequestBody: string, soapAction: string): Promise<any> {
-    const headers = {
-      'Content-Type': 'text/xml; charset=utf-8',
-      'SOAPAction': soapAction,
-    };
-    return this.sendRequest('POST', '', soapRequestBody, headers);
-  }
 }

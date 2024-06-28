@@ -1,8 +1,8 @@
 export interface BrandsResponse {
   NewDataSet: {
     Table: {
-      brand_id: string;
-      brand_desc: string;
+      bra_id: string;
+      bra_desc: string;
     }[];
   };
 }

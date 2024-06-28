@@ -1,7 +1,9 @@
-import { ImageItem } from "./image-item";
-
 export interface ImagesResponse {
   NewDataSet: {
-    Table: ImageItem[];
+    Table: {
+      item_id: string;
+      item_picture: string;
+      Order:string
+    }[];
   };
 }

@@ -1,4 +1,4 @@
-export interface FileItem {
+export class ImageResponseDto {
   file: string;
   order: number;
   productId: string;
