@@ -108,21 +108,6 @@ export class ProductResponseService {
     }
   }
 
-  addImagesProductCombined(productCombined: ProductResponseDto): ProductResponseDto {
-
-    //   const limitedProducts = productsCombined.slice(0, 50); // Obtener las imagenes de los primeras 50 productos.
-
-    //   const imagesProduct:ImageResponseDto[] = await this.getImagesByProductId(Number(product.item_id));
-
-
-    //   const productsCombinedWithImages = [];
-
-    // return productsCombinedWithImages;
-
-    return null
-
-  }
-
   private parseProductsBaseResponseToProductBaseResponseDtoArray(productsBaseResponse: ProductsBaseResponse): ProductResponseDto[]{
 
     if (!productsBaseResponse || !productsBaseResponse.NewDataSet || !productsBaseResponse.NewDataSet.Table) {
