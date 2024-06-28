@@ -134,7 +134,7 @@ export class NucleoService {
       productCombined.file = imageResponseDtoMain;
       productCombined.skus[0].files = imageResponseDtos;
       productsCombinedWithImages.push(productCombined);     
-      this.logger.log(`Se ha cargado el producto combinado con imagenes N°${productsCombinedWithImages.length}`);
+      this.logger.log(`Se ha cargado el producto combinado con imagenes número: ${productsCombinedWithImages.length}`);
     }    
     return productsCombinedWithImages;
   }
