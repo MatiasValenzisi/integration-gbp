@@ -33,20 +33,38 @@ npm install
 # Development
 $ npm run start:dev
 ```
-<!-- ## Estructura del proyecto -->
 
-<!-- src/
-├── app.module.ts          # Módulo principal
+## Estructura del proyecto
+
+```sh
+src/
+├── app.module.ts          
 ├── gbp/
 │   └── nucleo/
+│       ├── dto/
+│       │   └── brand-response.dto.ts
+│       │   └── image-response.dto.ts
+│       │   └── login-response.dto.ts
+│       │   └── product-response.dto.ts
+│       │   └── sku-response.dto.ts
 │       ├── interfaces/
-│       │   └── brand-item.interface.ts  # Interfaz de BrandItem
+│       │   └── brand-response.interface.ts
+│       │   └── images-response.interface.ts
+│       │   └── product-storage-group-response.interface.ts
+│       │   └── product-base-response.interface.ts
 │       ├── services/
-│       │   └── axios.service.ts         # Servicio de Axios para Nucleo.
-│       ├── nucleo.controller.ts         # Controlador del módulo Nucleo
-│       └── nucleo.module.ts             # Módulo Nucleo
-├── common/                # Utilidades y middlewares comunes
-└── main.ts                # Punto de entrada de la aplicación -->
+│       │   └── axios.service.ts
+│       │   └── brand-response.service.ts
+│       │   └── credential.service.ts
+│       │   └── login-response.service.ts
+│       │   └── nucleo.service.ts
+│       │   └── product-response.service.ts
+│       │   └── xml2js.service.ts
+│       ├── nucleo.controller.ts
+│       └── nucleo.module.ts
+├── app.module.ts
+└── main.ts
+```
 
 ## Tecnologia
 
