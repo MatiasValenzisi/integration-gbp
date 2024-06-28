@@ -8,6 +8,7 @@ import { ProductResponseService } from './product-response.service';
 import { CredentialService } from './credential.service';
 import { ProductResponseDto } from '../dto/product-response.dto';
 import { ImageResponseDto } from '../dto/image-response.dto';
+import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class NucleoService {
@@ -16,6 +17,7 @@ export class NucleoService {
   private tokenExpiry: Date;
   
   constructor(
+    private readonly logger: Logger,
     private readonly axiosService: AxiosService,
     private readonly credentialService: CredentialService,
     private readonly loginResponseService: LoginResponseService,
@@ -42,7 +44,7 @@ export class NucleoService {
       // Actualizar el token y su fecha de expiración. El token válido por 2 minutos.
       this.token = token;      
       this.tokenExpiry = new Date(new Date().getTime() + 2 * 60 * 1000);
-      console.log(`Se ha obtenido un nuevo token: ${token}`);
+      this.logger.log(`Se ha obtenido un nuevo token: ${token}`);
       return token;
       
     } catch (error) {
@@ -73,7 +75,7 @@ export class NucleoService {
 
     const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
     const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductBaseResponseDtoArray(soapResponse);    
-    console.log(`Se ha obtenido en el metodo getAllProductsBase, ${parseResponseData.length} productos base`);
+    this.logger.log(`Se ha obtenido en el metodo getAllProductsBase, ${parseResponseData.length} productos base`);
     return parseResponseData;
   }
 
@@ -89,8 +91,8 @@ export class NucleoService {
       </soap12:Body>`;  
 
     const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
-    const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductStorageGroupResponseDtoArray(soapResponse);    
-    console.log(`Se ha obtenido en el metodo getAllProductsStorageGroup, ${parseResponseData.length} productos de grupo de almacenamiento`);
+    const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductStorageGroupResponseDtoArray(soapResponse);
+    this.logger.log(`Se ha obtenido en el metodo getAllProductsStorageGroup, ${parseResponseData.length} productos de grupo de almacenamiento`);
     return parseResponseData;
   }
 
@@ -127,13 +129,13 @@ export class NucleoService {
     const limitedproductsCombined = productsCombined.slice(0, 10);
     
     for (const productCombined of limitedproductsCombined) {    
-      console.log(`Se esta buscando la imagen con id: ${productCombined.externalId}...`);
+      this.logger.log(`Se esta buscando la imagen con id: ${productCombined.externalId}...`);
       const imageResponseDtos: ImageResponseDto[] = await this.getAllImagesById(productCombined.externalId);
       const imageResponseDtoMain: ImageResponseDto = imageResponseDtos.find(item => item.order == -1);
       productCombined.file = imageResponseDtoMain;
       productCombined.skus[0].files = imageResponseDtos;
       productsCombinedWithImages.push(productCombined);     
-      console.log(`Se ha cargado el producto estructurado N°${productsCombinedWithImages.length}.`);
+      this.logger.log(`Se ha cargado el producto estructurado N°${productsCombinedWithImages.length}.`);
     }    
     return productsCombinedWithImages;
   }

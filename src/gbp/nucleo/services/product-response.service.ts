@@ -5,11 +5,12 @@ import { ProductsStorageGroupResponse } from "../interfaces/product-storage-grou
 import { ProductResponseDto } from "../dto/product-response.dto";
 import { ImageResponseDto } from '../dto/image-response.dto';
 import { ImagesResponse } from "../interfaces/images-response.interface";
+import { Logger } from "nestjs-pino";
 
 @Injectable()
 export class ProductResponseService {
 
-  constructor(private readonly xml2jsService: Xml2jsService){}
+  constructor(private readonly logger: Logger, private readonly xml2jsService: Xml2jsService){}
 
   async parseResponseToProductBaseResponseDtoArray(soapResponse: string): Promise<ProductResponseDto[]> {    
     
@@ -73,17 +74,15 @@ export class ProductResponseService {
         }
       });
 
-      console.log(`Existen ${productsDuplicated.length} productos duplicados`);
-      console.log(`Existen ${productsBaseUnique.length} productos base unicos`);
-      console.log(`Existen ${productsStorageGroupUnique.length} productos storage group unicos`);
-
-      const productCombinedDtoArray: ProductResponseDto[] = [
+      this.logger.log(`Existen ${productsDuplicated.length} productos duplicados de ${productsBaseDtos.length + productsStorageGroupDtos.length}`);
+      this.logger.log(`Existen ${productsBaseUnique.length} productos base unicos de ${productsBaseDtos.length}`);
+      this.logger.log(`Existen ${productsStorageGroupUnique.length} productos storage group unicos de ${productsStorageGroupDtos.length}`);
+  
+      return [
         ...productsDuplicated,
         ...productsBaseUnique,
         ...productsStorageGroupUnique
       ];
-  
-      return productCombinedDtoArray;
 
     } catch (error) {
       throw new Error(`combineBaseAndStorageProducts-ProductResponseService | ${error.message}`);

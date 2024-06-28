@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Xml2jsService } from "./xml2js.service";
 import * as uuidValidate from 'uuid-validate';
+import { Xml2jsService } from "./xml2js.service";
 
 @Injectable()
 export class LoginResponseService {

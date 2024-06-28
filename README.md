@@ -63,6 +63,7 @@ src/
 │       ├── nucleo.controller.ts
 │       └── nucleo.module.ts
 ├── app.module.ts
+├── logger.module.ts
 └── main.ts
 ```
 
@@ -83,6 +84,7 @@ src/
 - rxjs: Librería para programación reactiva. Versión ^7.8.1
 - uuid-validate: Valida si un dato es un uuid. Versión ^0.0.3
 - xml2js: Convertidor de XML a JavaScript. Versión ^0.6.2
+- nestjs-pino: Módulo de logging para aplicaciones NestJS que integra el logger pino. Versión ^4.1.0"
 
 ## Documentación
 
