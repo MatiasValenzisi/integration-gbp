@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
+import { Logger } from "nestjs-pino";
 import { Xml2jsService } from "./xml2js.service";
-import { ProductsBaseResponse } from "../interfaces/products-base-response.interface";
-import { ProductsStorageGroupResponse } from "../interfaces/product-storage-group-response.interface";
 import { ProductResponseDto } from "../dto/product-response.dto";
 import { ImageResponseDto } from '../dto/image-response.dto';
+import { ProductsBaseResponse } from "../interfaces/products-base-response.interface";
+import { ProductsStorageGroupResponse } from "../interfaces/product-storage-group-response.interface";
 import { ImagesResponse } from "../interfaces/images-response.interface";
-import { Logger } from "nestjs-pino";
 
 @Injectable()
 export class ProductResponseService {

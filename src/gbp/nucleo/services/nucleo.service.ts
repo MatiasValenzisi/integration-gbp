@@ -1,14 +1,13 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-
+import { Logger } from 'nestjs-pino';
 import { AxiosService } from './axios.service';
 import { LoginResponseService } from './login-response.service';
 import { BrandResponseService } from './brand-response.service';
-import { BrandResponseDto } from '../dto/brand-response.dto';
 import { ProductResponseService } from './product-response.service';
 import { CredentialService } from './credential.service';
+import { BrandResponseDto } from '../dto/brand-response.dto';
 import { ProductResponseDto } from '../dto/product-response.dto';
 import { ImageResponseDto } from '../dto/image-response.dto';
-import { Logger } from 'nestjs-pino';
 
 @Injectable()
 export class NucleoService {
