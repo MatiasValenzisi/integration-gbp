@@ -8,6 +8,7 @@ import { CredentialService } from './credential.service';
 import { BrandResponseDto } from '../dto/brand-response.dto';
 import { ProductResponseDto } from '../dto/product-response.dto';
 import { ImageResponseDto } from '../dto/image-response.dto';
+import { ImageResponseService } from './image-response.service';
 
 @Injectable()
 export class NucleoService {
@@ -21,7 +22,8 @@ export class NucleoService {
     private readonly credentialService: CredentialService,
     private readonly loginResponseService: LoginResponseService,
     private readonly brandResponseService: BrandResponseService,
-    private readonly productResponseService: ProductResponseService
+    private readonly productResponseService: ProductResponseService,
+    private readonly imageResponseService: ImageResponseService
   ) {}
 
   async authenticate(): Promise<string> {   
@@ -114,7 +116,7 @@ export class NucleoService {
       </soap12:Body>`;  
 
     const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
-    const parseResponseData: ImageResponseDto[] = await this.productResponseService.parseResponseToImageResponseDtoArray(soapResponse);    
+    const parseResponseData: ImageResponseDto[] = await this.imageResponseService.parseResponseToImageResponseDtoArray(soapResponse);    
     return parseResponseData;
   }
 
@@ -125,7 +127,7 @@ export class NucleoService {
     const productsCombinedWithImages: ProductResponseDto[] = [];
     const productsCombined: ProductResponseDto[] = this.productResponseService.combineBaseAndStorageProducts(productsBaseDtos, productsStorageGroupDtos);
     
-    const limitedproductsCombined = productsCombined.slice(0, 100); // Cantidad de productos combinados a los que se le busca la imagen.
+    const limitedproductsCombined = productsCombined.slice(0, 1500); // Cantidad de productos combinados a los que se le busca la imagen.
     
     for (const productCombined of limitedproductsCombined) {    
       const imageResponseDtos: ImageResponseDto[] = await this.getAllImagesById(productCombined.externalId);

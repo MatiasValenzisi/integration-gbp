@@ -7,12 +7,13 @@ import { CredentialService } from './services/credential.service';
 import { LoginResponseService } from './services/login-response.service';
 import { BrandResponseService } from './services/brand-response.service';
 import { ProductResponseService } from './services/product-response.service';
+import { ImageResponseService } from './services/image-response.service';
 
 @Module({
   imports: [],
   controllers: [NucleoController],
   providers: [NucleoService, CredentialService, AxiosService, Xml2jsService, 
-    LoginResponseService, BrandResponseService, ProductResponseService],
+    LoginResponseService, BrandResponseService, ProductResponseService, ImageResponseService],
   exports: [],
 })
 

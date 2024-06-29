@@ -2,10 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { Logger } from "nestjs-pino";
 import { Xml2jsService } from "./xml2js.service";
 import { ProductResponseDto } from "../dto/product-response.dto";
-import { ImageResponseDto } from '../dto/image-response.dto';
 import { ProductsBaseResponse } from "../interfaces/products-base-response.interface";
 import { ProductsStorageGroupResponse } from "../interfaces/product-storage-group-response.interface";
-import { ImagesResponse } from "../interfaces/images-response.interface";
 
 @Injectable()
 export class ProductResponseService {
@@ -89,25 +87,6 @@ export class ProductResponseService {
     }
   }
 
-  async parseResponseToImageResponseDtoArray(soapResponse: string): Promise<ImageResponseDto[]> {    
-    
-    try {
-      const soapBody = await this.xml2jsService.extractSoapBody(soapResponse);
-      const xmlData: string = this.extractXmlImagespData(soapBody);
-      
-      if (xmlData == 'Not data found.'){
-        return [];
-      }
-
-      const imagesResponse: ImagesResponse = await this.xml2jsService.parseXml<ImagesResponse>(xmlData, 'parseResponseToImageResponseDtoArray');
-      const imageResponseDtoArray: ImageResponseDto[] = this.parseImageResponseToImageResponseDtoArray(imagesResponse);
-      return imageResponseDtoArray;
-
-    } catch (error) {
-      throw new Error(`parseResponseToImageResponseDto-ProductResponseService | ${error.message}`);
-    }
-  }
-
   private parseProductsBaseResponseToProductBaseResponseDtoArray(productsBaseResponse: ProductsBaseResponse): ProductResponseDto[]{
 
     if (!productsBaseResponse || !productsBaseResponse.NewDataSet || !productsBaseResponse.NewDataSet.Table) {
@@ -187,26 +166,7 @@ export class ProductResponseService {
 
     return productStorageGroupResponseDtos;
   }
-
-  private parseImageResponseToImageResponseDtoArray(imagesResponse: ImagesResponse): ImageResponseDto[]{
-
-    if (!imagesResponse || !imagesResponse.NewDataSet || !imagesResponse.NewDataSet.Table) {
-      throw new Error(`parseImageResponseToImageResponseDtoArray | Formato de datos incorrecto`);
-    }
-
-    // Si viene una sola imagen, la trata como un array de igual manera.
-    const tableData = Array.isArray(imagesResponse.NewDataSet.Table)
-    ? imagesResponse.NewDataSet.Table
-    : [imagesResponse.NewDataSet.Table];
-
-    const imageResponseDtos: ImageResponseDto[] = tableData.map(item => ({
-      file: `www.simulacion.url.s3.com/${item.item_id}_order_${item.Order}`,
-      order: Number(item.Order),
-      productId: item.item_id,
-    }));
-    return imageResponseDtos;
-  }
-  
+ 
   private extractXmlProductsBaseData(soapBody: any): string {
     const wsFullJaus_Item_funGetXMLDataResult: string = soapBody?.wsFullJaus_Item_funGetXMLDataResponse?.wsFullJaus_Item_funGetXMLDataResult;
     if (!wsFullJaus_Item_funGetXMLDataResult) {
@@ -222,12 +182,4 @@ export class ProductResponseService {
     }
     return item_funGetXMLDataByStorageGroupResult;
   }
-
-  private extractXmlImagespData(soapBody: any): string {
-    const ItemImages_funGetXMLDataResult: string = soapBody?.ItemImages_funGetXMLDataResponse?.ItemImages_funGetXMLDataResult;
-    if (!ItemImages_funGetXMLDataResult) {
-      throw new Error(`extractXmlImageData | No se encontró ItemImages_funGetXMLDataResult en el cuerpo SOAP`);
-    }
-    return ItemImages_funGetXMLDataResult;
-  }  
 }
