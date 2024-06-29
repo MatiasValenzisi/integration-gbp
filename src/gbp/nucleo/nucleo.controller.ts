@@ -68,11 +68,11 @@ export class NucleoController {
     }
   }
 
-  @Get('products/images/:id')
+  @Get('product/images/load/:id')
   @HttpCode(HttpStatus.OK)
-  async getImageById(@Param('id') id: number): Promise<ImageResponseDto[]> {
+  async loadImagesById(@Param('id') id: number): Promise<ImageResponseDto[]> {
     try {
-      const imageResponseDtos: ImageResponseDto[] = await this.nucleoService.getAllImagesById(id);
+      const imageResponseDtos: ImageResponseDto[] = await this.nucleoService.loadImagesById(id);
       return imageResponseDtos;
     } catch (error) {
       throw new Error(`Error al obtener getImageById: ${error.message}`);
@@ -84,7 +84,7 @@ export class NucleoController {
   async getAllProductsCombinedWithImages(): Promise<ProductResponseDto[]> {
     try {
       const productCombinedWithImagesResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsCombinedWithImages();
-      const limitedProducts: ProductResponseDto[] = productCombinedWithImagesResponseDtos.slice(0, 100); // Mostrar los primeros 100 productos.
+      const limitedProducts: ProductResponseDto[] = productCombinedWithImagesResponseDtos.slice(0, 1000); // Mostrar los primeros 1000 productos.
       return limitedProducts;
     } catch (error) {
       throw new Error(`Error al obtener getAllProductsCombinedWithImages: ${error.message}`);

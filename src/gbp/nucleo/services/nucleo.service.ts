@@ -105,7 +105,7 @@ export class NucleoService {
     return productsCombined;
   }
 
-  async getAllImagesById(id: number): Promise<ImageResponseDto[]> {
+  async loadImagesById(id: number): Promise<ImageResponseDto[]> {
     
     const token = await this.authenticate();
 
@@ -130,7 +130,7 @@ export class NucleoService {
     const limitedproductsCombined = productsCombined.slice(0, 1500); // Cantidad de productos combinados a los que se le busca la imagen.
     
     for (const productCombined of limitedproductsCombined) {    
-      const imageResponseDtos: ImageResponseDto[] = await this.getAllImagesById(productCombined.externalId);
+      const imageResponseDtos: ImageResponseDto[] = await this.loadImagesById(productCombined.externalId);
       const imageResponseDtoMain: ImageResponseDto = imageResponseDtos.find(item => item.order == -1);
       productCombined.file = imageResponseDtoMain;
       productCombined.skus[0].files = imageResponseDtos;

@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { join } from "path";
+import { promises as fsPromises } from "fs";
 import { Xml2jsService } from "./xml2js.service";
 import { ImagesResponse } from "../interfaces/images-response.interface";
 import { ImageResponseDto } from "../dto/image-response.dto";
-import { join } from "path";
-import { promises as fsPromises } from "fs";
 
 const { writeFile, mkdir } = fsPromises;
 
@@ -61,15 +61,13 @@ export class ImageResponseService {
   private async saveImageInLocal(id: string, order: number, base64: string): Promise<string> {
     
     try {
-
        const filename = `${id}_order_${order}.png`;
-       const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'img', filename);
+       const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'img', filename); 
  
        // Verificar si el directorio 'public/nucleo/img' existe, si no, créalo.
        await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'img'), { recursive: true }); 
-
-       await writeFile(imagePath, Buffer.from(base64, 'base64'));
- 
+       
+       await writeFile(imagePath, Buffer.from(base64, 'base64')); 
        return `/public/nucleo/img/${filename}`;
   
     } catch (error) {
