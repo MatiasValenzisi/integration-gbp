@@ -37,8 +37,7 @@ export class NucleoController {
   async getAllProductsBase(): Promise<ProductResponseDto[]> {
     try {
       const productBaseResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsBase();
-      const limitedProducts: ProductResponseDto[] = productBaseResponseDtos.slice(0, 100); // Mostrar los primeros 100 productos.
-      return limitedProducts;
+      return productBaseResponseDtos;
     } catch (error) {
       throw new Error(`Error al obtener getAllProductsBase: ${error.message}`);
     }
@@ -49,8 +48,7 @@ export class NucleoController {
   async getAllProductsStorageGroup(): Promise<ProductResponseDto[]> {
     try {
       const productStorageGroupResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsStorageGroup();
-      const limitedProducts: ProductResponseDto[] = productStorageGroupResponseDtos.slice(0, 100); // Mostrar los primeros 100 productos.
-      return limitedProducts;
+      return productStorageGroupResponseDtos;
     } catch (error) {
       throw new Error(`Error al obtener getAllProductsStorageGroup: ${error.message}`);
     }
@@ -61,8 +59,7 @@ export class NucleoController {
   async getAllProductsCombined(): Promise<ProductResponseDto[]> {
     try {
       const productCombinedResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsCombined();
-      const limitedProducts: ProductResponseDto[] = productCombinedResponseDtos.slice(0, 100); // Mostrar los primeros 100 productos.
-      return limitedProducts;
+      return productCombinedResponseDtos;
     } catch (error) {
       throw new Error(`Error al obtener getAllProductsCombined: ${error.message}`);
     }
@@ -84,8 +81,7 @@ export class NucleoController {
   async getAllProductsCombinedWithImages(): Promise<ProductResponseDto[]> {
     try {
       const productCombinedWithImagesResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsCombinedWithImages();
-      const limitedProducts: ProductResponseDto[] = productCombinedWithImagesResponseDtos.slice(0, 1000); // Mostrar los primeros 1000 productos.
-      return limitedProducts;
+      return productCombinedWithImagesResponseDtos;
     } catch (error) {
       throw new Error(`Error al obtener getAllProductsCombinedWithImages: ${error.message}`);
     }
