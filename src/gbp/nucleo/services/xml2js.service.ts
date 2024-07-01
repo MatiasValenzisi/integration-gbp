@@ -30,7 +30,7 @@ export class Xml2jsService {
     return new Promise((resolve, reject) => {
       parseString(xml, this.parserOptions, (err, result) => {
         if (err) {
-          reject(new Error(`${methodName} | Error al parsear XML | ${err.message}`));
+          reject(new Error(`${methodName} | Error al parsear el XML: " ${xml} " | ${err.message}`));
         } else {
           resolve(result as T);
         }
