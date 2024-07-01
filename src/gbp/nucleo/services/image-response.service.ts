@@ -58,13 +58,13 @@ export class ImageResponseService {
   
   private async saveImageInLocal(id: string, order: number, base64: string): Promise<string> {
     try {
-      const filename = `${id}_order_${order}.png`;
-      const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'img', filename); 
+      const filename = `image_order_${order}.png`;
+      const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'image', id, filename); 
   
       // Verificar si el directorio 'public/nucleo/img' existe, si no, crearlo.
-      await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'img'), { recursive: true });      
+      await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'image', id), { recursive: true });      
       await writeFile(imagePath, Buffer.from(base64, 'base64'));      
-      return `www.url.s3.com/gbp/nucleo/img/${filename}`;
+      return `www.url.s3.com/gbp/nucleo/image/${id}/${filename}`;
       
     } catch (error) {
       throw new Error(`saveImageInLocal | Error al guardar la imagen en local: ${error.message}`);

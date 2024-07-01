@@ -38,10 +38,8 @@ export class NucleoService {
 
       const soapResponse: string = await this.axiosService.sendSoapPostRequest('', soapBody);
       const token = await this.loginResponseService.parseResponseToToken(soapResponse);
-
-      this.token = token;
-      this.tokenExpiry = new Date(new Date().getTime() + 2 * 60 * 1000);
-      this.logger.log(`Se ha obtenido un nuevo token: ${token}`);
+      this.setToken(token);
+      
       return token;
     } catch (error) {
       throw new InternalServerErrorException(`Error durante la autenticación: ${error.message}`);
@@ -149,6 +147,12 @@ export class NucleoService {
     } catch (error) {
       throw new InternalServerErrorException(`Error en loadImagesById: ${error.message}`);
     }
+  }
+
+  setToken(token: string) {
+    this.token = token;
+    this.tokenExpiry = new Date(new Date().getTime() + 2 * 60 * 1000);
+    this.logger.log(`Token actualizado al ${token}`);
   }
 
   private isTokenActive(): boolean {
