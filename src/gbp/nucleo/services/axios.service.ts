@@ -35,6 +35,7 @@ export class AxiosService {
 
   // Metodo para enviar una solicitud con reintentos.
   async sendRequestWithRetry(method: Method, url: string, data: any = null, headers: any = {}, params: any = null, retryIntervals: number[] = []): Promise<any> {
+    
     let attempts = 0;
     const maxAttempts = retryIntervals.length + 1;
 
