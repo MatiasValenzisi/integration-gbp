@@ -126,11 +126,8 @@ export class NucleoService {
     const productsStorageGroupDtos: ProductResponseDto[] = await this.getAllProductsStorageGroup();
     const productsCombinedWithImages: ProductResponseDto[] = [];
     const productsCombined: ProductResponseDto[] = this.productResponseService.combineBaseAndStorageProducts(productsBaseDtos, productsStorageGroupDtos);
-    
-    // TODO: Cantidad de productos combinados a los que se le busca la imagen.
-    const limitedproductsCombined = productsCombined.slice(0, 1500);
-    
-    for (const productCombined of limitedproductsCombined) {    
+        
+    for (const productCombined of productsCombined) {    
       const imageResponseDtos: ImageResponseDto[] = await this.loadImagesById(productCombined.externalId);
       const imageResponseDtoMain: ImageResponseDto = imageResponseDtos.find(item => item.order == -1);
       productCombined.file = imageResponseDtoMain;

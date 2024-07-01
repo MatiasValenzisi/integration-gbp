@@ -64,7 +64,7 @@ export class ImageResponseService {
        const filename = `${id}_order_${order}.png`;
        const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'img', filename); 
  
-       // Verificar si el directorio 'public/nucleo/img' existe, si no, créalo.
+       // Verificar si el directorio 'public/nucleo/img' existe, si no, lo crea en dist.
        await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'img'), { recursive: true }); 
        
        await writeFile(imagePath, Buffer.from(base64, 'base64')); 
