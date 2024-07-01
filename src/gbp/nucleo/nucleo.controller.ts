@@ -1,4 +1,5 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Post, InternalServerErrorException } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 import { NucleoService } from './services/nucleo.service';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { BrandResponseDto } from './dto/brand-response.dto';
@@ -7,8 +8,8 @@ import { ImageResponseDto } from './dto/image-response.dto';
 
 @Controller('nucleo')
 export class NucleoController {
-  
-  constructor(private readonly nucleoService: NucleoService) {}
+
+  constructor(private readonly logger: Logger, private readonly nucleoService: NucleoService) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -17,7 +18,8 @@ export class NucleoController {
       const token: string = await this.nucleoService.authenticate();
       return { token };
     } catch (error) {
-      throw new Error(`Error al obtener authenticate: ${error.message}`);
+      this.logger.error(`Error en login: ${error.message}`);
+      throw new InternalServerErrorException('Error al autenticar');
     }
   }
 
@@ -25,10 +27,10 @@ export class NucleoController {
   @HttpCode(HttpStatus.OK)
   async getAllBrands(): Promise<BrandResponseDto[]> {
     try {
-      const brandResponseDtos: BrandResponseDto[] = await this.nucleoService.getAllBrands();
-      return brandResponseDtos;
+      return await this.nucleoService.getAllBrands();
     } catch (error) {
-      throw new Error(`Error al obtener getAllBrands: ${error.message}`);
+      this.logger.error(`Error en getAllBrands: ${error.message}`);
+      throw new InternalServerErrorException('Error al obtener marcas');
     }
   }
 
@@ -36,10 +38,10 @@ export class NucleoController {
   @HttpCode(HttpStatus.OK)
   async getAllProductsBase(): Promise<ProductResponseDto[]> {
     try {
-      const productBaseResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsBase();
-      return productBaseResponseDtos;
+      return await this.nucleoService.getAllProductsBase();
     } catch (error) {
-      throw new Error(`Error al obtener getAllProductsBase: ${error.message}`);
+      this.logger.error(`Error en getAllProductsBase: ${error.message}`);
+      throw new InternalServerErrorException('Error al obtener productos base');
     }
   }
 
@@ -47,10 +49,10 @@ export class NucleoController {
   @HttpCode(HttpStatus.OK)
   async getAllProductsStorageGroup(): Promise<ProductResponseDto[]> {
     try {
-      const productStorageGroupResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsStorageGroup();
-      return productStorageGroupResponseDtos;
+      return await this.nucleoService.getAllProductsStorageGroup();
     } catch (error) {
-      throw new Error(`Error al obtener getAllProductsStorageGroup: ${error.message}`);
+      this.logger.error(`Error en getAllProductsStorageGroup: ${error.message}`);
+      throw new InternalServerErrorException('Error al obtener productos por grupo de almacenamiento');
     }
   }
 
@@ -58,10 +60,10 @@ export class NucleoController {
   @HttpCode(HttpStatus.OK)
   async getAllProductsCombined(): Promise<ProductResponseDto[]> {
     try {
-      const productCombinedResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsCombined();
-      return productCombinedResponseDtos;
+      return await this.nucleoService.getAllProductsCombined();
     } catch (error) {
-      throw new Error(`Error al obtener getAllProductsCombined: ${error.message}`);
+      this.logger.error(`Error en getAllProductsCombined: ${error.message}`);
+      throw new InternalServerErrorException('Error al obtener productos combinados');
     }
   }
 
@@ -69,10 +71,10 @@ export class NucleoController {
   @HttpCode(HttpStatus.OK)
   async loadImagesById(@Param('id') id: number): Promise<ImageResponseDto[]> {
     try {
-      const imageResponseDtos: ImageResponseDto[] = await this.nucleoService.loadImagesById(id);
-      return imageResponseDtos;
+      return await this.nucleoService.loadImagesById(id);
     } catch (error) {
-      throw new Error(`Error al obtener getImageById: ${error.message}`);
+      this.logger.error(`Error en loadImagesById: ${error.message}`);
+      throw new InternalServerErrorException('Error al cargar imágenes por ID');
     }
   }
 
@@ -80,10 +82,10 @@ export class NucleoController {
   @HttpCode(HttpStatus.OK)
   async getAllProductsCombinedWithImages(): Promise<ProductResponseDto[]> {
     try {
-      const productCombinedWithImagesResponseDtos: ProductResponseDto[] = await this.nucleoService.getAllProductsCombinedWithImages();
-      return productCombinedWithImagesResponseDtos;
+      return await this.nucleoService.getAllProductsCombinedWithImages();
     } catch (error) {
-      throw new Error(`Error al obtener getAllProductsCombinedWithImages: ${error.message}`);
+      this.logger.error(`Error en getAllProductsCombinedWithImages: ${error.message}`);
+      throw new InternalServerErrorException('Error al obtener productos combinados con imágenes');
     }
   }
 }

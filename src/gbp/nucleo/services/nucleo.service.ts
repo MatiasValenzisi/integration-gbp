@@ -15,7 +15,7 @@ export class NucleoService {
 
   private token: string;
   private tokenExpiry: Date;
-  
+
   constructor(
     private readonly logger: Logger,
     private readonly axiosService: AxiosService,
@@ -26,12 +26,9 @@ export class NucleoService {
     private readonly imageResponseService: ImageResponseService
   ) {}
 
-  async authenticate(): Promise<string> {   
-    
+  async authenticate(): Promise<string> {
     try {
-
-      // Verifica si ya hay un token almacenado.
-      if (this.isTokenActive()){
+      if (this.isTokenActive()) {
         return this.token;
       }
 
@@ -41,104 +38,119 @@ export class NucleoService {
 
       const soapResponse: string = await this.axiosService.sendSoapPostRequest('', soapBody);
       const token = await this.loginResponseService.parseResponseToToken(soapResponse);
-      
-      // Actualizar el token y su fecha de expiración. El token válido por 2 minutos.
-      this.token = token;      
+
+      this.token = token;
       this.tokenExpiry = new Date(new Date().getTime() + 2 * 60 * 1000);
       this.logger.log(`Se ha obtenido un nuevo token: ${token}`);
       return token;
-      
     } catch (error) {
       throw new InternalServerErrorException(`Error durante la autenticación: ${error.message}`);
-    }    
+    }
   }
 
-  async getAllBrands(): Promise<BrandResponseDto[]> {  
+  async getAllBrands(): Promise<BrandResponseDto[]> {
+    try {
+      const token = await this.authenticate();
 
-    const token = await this.authenticate();
+      const soapBody: string = `<soap12:Body>
+        <Branch_funGetXMLData xmlns="http://microsoft.com/webservices/" />
+      </soap12:Body>`;
 
-    const soapBody: string = `<soap12:Body>
-      <Branch_funGetXMLData xmlns="http://microsoft.com/webservices/" />
-    </soap12:Body>`;
-
-    const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
-    const parseResponseData: BrandResponseDto[] = await this.brandResponseService.parseResponseToBrandResponseDtoArray(soapResponse);     
-    return parseResponseData;
+      const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
+      const parseResponseData: BrandResponseDto[] = await this.brandResponseService.parseResponseToBrandResponseDtoArray(soapResponse);
+      return parseResponseData;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error en getAllBrands: ${error.message}`);
+    }
   }
 
-  async getAllProductsBase(): Promise<ProductResponseDto[]> {  
+  async getAllProductsBase(): Promise<ProductResponseDto[]> {
+    try {
+      const token = await this.authenticate();
 
-    const token = await this.authenticate();
-
-    const soapBody: string = `<soap12:Body>
+      const soapBody: string = `<soap12:Body>
         <wsFullJaus_Item_funGetXMLData xmlns="http://microsoft.com/webservices/" />
-      </soap12:Body>`;          
+      </soap12:Body>`;
 
-    const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
-    const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductBaseResponseDtoArray(soapResponse);    
-    this.logger.log(`Se ha obtenido en el metodo getAllProductsBase, ${parseResponseData.length} productos base`);
-    return parseResponseData;
+      const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
+      const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductBaseResponseDtoArray(soapResponse);
+      this.logger.log(`Se ha obtenido en el metodo getAllProductsBase, ${parseResponseData.length} productos base`);
+      return parseResponseData;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error en getAllProductsBase: ${error.message}`);
+    }
   }
 
-  async getAllProductsStorageGroup(): Promise<ProductResponseDto[]> {  
+  async getAllProductsStorageGroup(): Promise<ProductResponseDto[]> {
+    try {
+      const token = await this.authenticate();
 
-    const token = await this.authenticate();
-
-    const soapBody: string = `<soap12:Body>
+      const soapBody: string = `<soap12:Body>
         <Item_funGetXMLDataByStorageGroup xmlns="http://microsoft.com/webservices/">
           <intCompId>${this.credentialService.companyId}</intCompId>
           <intStorId>${this.credentialService.storageGroup}</intStorId>
         </Item_funGetXMLDataByStorageGroup>
-      </soap12:Body>`;  
+      </soap12:Body>`;
 
-    const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
-    const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductStorageGroupResponseDtoArray(soapResponse);
-    this.logger.log(`Se ha obtenido en el metodo getAllProductsStorageGroup, ${parseResponseData.length} productos de grupo de almacenamiento`);
-    return parseResponseData;
+      const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
+      const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductStorageGroupResponseDtoArray(soapResponse);
+      this.logger.log(`Se ha obtenido en el metodo getAllProductsStorageGroup, ${parseResponseData.length} productos de grupo de almacenamiento`);
+      return parseResponseData;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error en getAllProductsStorageGroup: ${error.message}`);
+    }
   }
 
   async getAllProductsCombined(): Promise<ProductResponseDto[]> {
-
-    const productsBaseDtos: ProductResponseDto[] = await this.getAllProductsBase();
-    const productsStorageGroupDtos: ProductResponseDto[] = await this.getAllProductsStorageGroup();
-    const productsCombined: ProductResponseDto[] = this.productResponseService.combineBaseAndStorageProducts(productsBaseDtos, productsStorageGroupDtos);
-    return productsCombined;
-  }
-
-  async loadImagesById(id: number): Promise<ImageResponseDto[]> {
-    
-    const token = await this.authenticate();
-
-    const soapBody: string = `<soap12:Body>
-        <ItemImages_funGetXMLData xmlns="http://microsoft.com/webservices/">
-          <intItemId>${id}</intItemId>
-        </ItemImages_funGetXMLData>
-      </soap12:Body>`;  
-
-    const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
-    const parseResponseData: ImageResponseDto[] = await this.imageResponseService.parseResponseToImageResponseDtoArray(soapResponse);    
-    return parseResponseData;
+    try {
+      const productsBaseDtos: ProductResponseDto[] = await this.getAllProductsBase();
+      const productsStorageGroupDtos: ProductResponseDto[] = await this.getAllProductsStorageGroup();
+      const productsCombined: ProductResponseDto[] = this.productResponseService.combineBaseAndStorageProducts(productsBaseDtos, productsStorageGroupDtos);
+      return productsCombined;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error en getAllProductsCombined: ${error.message}`);
+    }
   }
 
   async getAllProductsCombinedWithImages(): Promise<ProductResponseDto[]> {
+    try {
+      const productsBaseDtos: ProductResponseDto[] = await this.getAllProductsBase();
+      const productsStorageGroupDtos: ProductResponseDto[] = await this.getAllProductsStorageGroup();
+      const productsCombinedWithImages: ProductResponseDto[] = [];
 
-    const productsBaseDtos: ProductResponseDto[] = await this.getAllProductsBase();
-    const productsStorageGroupDtos: ProductResponseDto[] = await this.getAllProductsStorageGroup();
-    const productsCombinedWithImages: ProductResponseDto[] = [];
-    const productsCombined: ProductResponseDto[] = this.productResponseService.combineBaseAndStorageProducts(productsBaseDtos, productsStorageGroupDtos);
-        
-    for (const productCombined of productsCombined) {    
-      const imageResponseDtos: ImageResponseDto[] = await this.loadImagesById(productCombined.externalId);
-      const imageResponseDtoMain: ImageResponseDto = imageResponseDtos.find(item => item.order == -1);
-      productCombined.file = imageResponseDtoMain;
-      productCombined.skus[0].files = imageResponseDtos;
-      productsCombinedWithImages.push(productCombined);     
-      this.logger.log(`Se ha cargado el producto combinado con imagenes número: ${productsCombinedWithImages.length}`);
+      for (const productCombined of this.productResponseService.combineBaseAndStorageProducts(productsBaseDtos, productsStorageGroupDtos)) {
+        const imageResponseDtos: ImageResponseDto[] = await this.loadImagesById(productCombined.externalId);
+        const imageResponseDtoMain: ImageResponseDto = imageResponseDtos.find(item => item.order === -1);
+        productCombined.file = imageResponseDtoMain;
+        productCombined.skus[0].files = imageResponseDtos;
+        productsCombinedWithImages.push(productCombined);
+        this.logger.log(`Se ha cargado el producto combinado con imágenes número: ${productsCombinedWithImages.length}`);
+      }
+
+      return productsCombinedWithImages;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error en getAllProductsCombinedWithImages: ${error.message}`);
     }
-    return productsCombinedWithImages;
   }
 
-  // Valida si el token esta activo o se vencio.
+  async loadImagesById(id: number): Promise<ImageResponseDto[]> {
+    try {
+      const token = await this.authenticate();
+
+      const soapBody: string = `<soap12:Body>
+        <ItemImages_funGetXMLData xmlns="http://microsoft.com/webservices/">
+          <intItemId>${id}</intItemId>
+        </ItemImages_funGetXMLData>
+      </soap12:Body>`;
+
+      const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody);
+      const parseResponseData: ImageResponseDto[] = await this.imageResponseService.parseResponseToImageResponseDtoArray(soapResponse);
+      return parseResponseData;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error en loadImagesById: ${error.message}`);
+    }
+  }
+
   private isTokenActive(): boolean {
     return !!this.token && !!this.tokenExpiry && new Date() < this.tokenExpiry;
   }

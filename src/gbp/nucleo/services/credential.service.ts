@@ -16,5 +16,9 @@ export class CredentialService {
     this.companyId = Number(process.env.NUCLEO_COMPANY) || 0;
     this.webService = Number(process.env.NUCLEO_WEB_SERVICE) || 0;
     this.storageGroup = process.env.NUCLEO_STORAGE_GROUP || '';
+
+    if (!this.baseUrl || !this.userName || !this.password || !this.companyId || !this.webService || !this.storageGroup) {
+      throw new Error('Faltan variables de entorno requeridas para la configuración de credenciales.');
+    }
   }
 }

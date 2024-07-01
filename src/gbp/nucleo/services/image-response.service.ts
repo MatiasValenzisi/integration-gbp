@@ -10,29 +10,27 @@ const { writeFile, mkdir } = fsPromises;
 @Injectable()
 export class ImageResponseService {
 
-  constructor(private readonly xml2jsService: Xml2jsService){}
+  constructor(private readonly xml2jsService: Xml2jsService) {}
 
   async parseResponseToImageResponseDtoArray(soapResponse: string): Promise<ImageResponseDto[]> {    
-    
     try {
       const soapBody = await this.xml2jsService.extractSoapBody(soapResponse);
-      const xmlData: string = this.extractXmlImagespData(soapBody);
+      const xmlData: string = this.extractXmlImagesData(soapBody);
       
-      if (xmlData == 'Not data found.'){
+      if (xmlData === 'Not data found.') {
         return [];
       }
 
       const imagesResponse: ImagesResponse = await this.xml2jsService.parseXml<ImagesResponse>(xmlData, 'parseResponseToImageResponseDtoArray');
       const imageResponseDtoArray: ImageResponseDto[] = await this.parseImageResponseToImageResponseDtoArray(imagesResponse);
+      
       return imageResponseDtoArray;
-
     } catch (error) {
-      throw new Error(`parseResponseToImageResponseDto-ProductResponseService | ${error.message}`);
+      throw new Error(`parseResponseToImageResponseDtoArray-ImageResponseService | ${error.message}`);
     }
   }
 
   private async parseImageResponseToImageResponseDtoArray(imagesResponse: ImagesResponse): Promise<ImageResponseDto[]> {
-    
     if (!imagesResponse || !imagesResponse.NewDataSet || !imagesResponse.NewDataSet.Table) {
       throw new Error(`parseImageResponseToImageResponseDtoArray | Formato de datos incorrecto`);
     }
@@ -59,23 +57,21 @@ export class ImageResponseService {
   }
   
   private async saveImageInLocal(id: string, order: number, base64: string): Promise<string> {
-    
     try {
-       const filename = `${id}_order_${order}.png`;
-       const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'img', filename); 
- 
-       // Verificar si el directorio 'public/nucleo/img' existe, si no, lo crea en dist.
-       await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'img'), { recursive: true }); 
-       
-       await writeFile(imagePath, Buffer.from(base64, 'base64')); 
-       return `www.url.s3.com/gbp/nucleo/img/${filename}`;
+      const filename = `${id}_order_${order}.png`;
+      const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'img', filename); 
   
+      // Verificar si el directorio 'public/nucleo/img' existe, si no, crearlo.
+      await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'img'), { recursive: true });      
+      await writeFile(imagePath, Buffer.from(base64, 'base64'));      
+      return `www.url.s3.com/gbp/nucleo/img/${filename}`;
+      
     } catch (error) {
       throw new Error(`saveImageInLocal | Error al guardar la imagen en local: ${error.message}`);
     }
   }
 
-  private extractXmlImagespData(soapBody: any): string {
+  private extractXmlImagesData(soapBody: any): string {
     const ItemImages_funGetXMLDataResult: string = soapBody?.ItemImages_funGetXMLDataResponse?.ItemImages_funGetXMLDataResult;
     if (!ItemImages_funGetXMLDataResult) {
       throw new Error(`extractXmlImageData | No se encontró ItemImages_funGetXMLDataResult en el cuerpo SOAP`);

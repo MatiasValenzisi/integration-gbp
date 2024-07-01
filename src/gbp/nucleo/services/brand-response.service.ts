@@ -14,7 +14,7 @@ export class BrandResponseService {
       const soapBody = await this.xml2jsService.extractSoapBody(soapResponse);
       const xmlData: string = this.extractXmlData(soapBody);
       
-      if (xmlData == 'Not data found.'){
+      if (xmlData === 'Not data found.') {
         return [];
       }
 
@@ -27,8 +27,7 @@ export class BrandResponseService {
     }
   }
   
-  private parseBrandsResponseToBrandResponseDtoArray(brandsResponse: BrandsResponse): BrandResponseDto[]{
-
+  private parseBrandsResponseToBrandResponseDtoArray(brandsResponse: BrandsResponse): BrandResponseDto[] {
     if (!brandsResponse || !brandsResponse.NewDataSet || !brandsResponse.NewDataSet.Table) {
       throw new Error(`parseBrandsResponseToBrandResponseDtoArray | Formato de datos incorrecto`);
     }
@@ -43,7 +42,7 @@ export class BrandResponseService {
   private extractXmlData(soapBody: any): string {
     const branch_funGetXMLDataResult: string = soapBody?.Branch_funGetXMLDataResponse?.Branch_funGetXMLDataResult;
     if (!branch_funGetXMLDataResult) {
-      throw new Error(`extractXmlData | No se encontró brand_funGetXMLDataResult`);
+      throw new Error(`extractXmlData | No se encontró Branch_funGetXMLDataResult  en el cuerpo SOAP`);
     }
     return branch_funGetXMLDataResult;
   }

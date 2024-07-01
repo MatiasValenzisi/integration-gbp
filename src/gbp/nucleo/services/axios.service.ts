@@ -8,8 +8,9 @@ export class AxiosService {
   constructor(private credentialService: CredentialService) {}
 
   async sendSoapPostRequest(token: string, soapBody: string): Promise<any> {
-    return this.sendRequest('POST', '', this.buildSoapRequestBody(token, soapBody), 
-    { 'Content-Type': 'text/xml; charset=utf-8' });
+    const headers = { 'Content-Type': 'text/xml; charset=utf-8' };
+    const requestBody = this.buildSoapRequestBody(token, soapBody);
+    return this.sendRequest('POST', '', requestBody, headers);
   }
 
   buildSoapRequestBody(token: string, soapBody: string): string {
@@ -31,10 +32,8 @@ export class AxiosService {
   }
 
   async sendRequest(method: Method, url: string, data: any = null, headers: any = {}, params: any = null): Promise<any> {
-    
     try {      
-      const config: AxiosRequestConfig = 
-      { 
+      const config: AxiosRequestConfig = { 
         method, 
         url: `${this.credentialService.baseUrl}${url}`, 
         headers, 
