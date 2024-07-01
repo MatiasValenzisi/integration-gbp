@@ -68,7 +68,7 @@ export class ImageResponseService {
        await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'img'), { recursive: true }); 
        
        await writeFile(imagePath, Buffer.from(base64, 'base64')); 
-       return `/public/nucleo/img/${filename}`;
+       return `www.url.s3.com/gbp/nucleo/img/${filename}`;
   
     } catch (error) {
       throw new Error(`saveImageInLocal | Error al guardar la imagen en local: ${error.message}`);

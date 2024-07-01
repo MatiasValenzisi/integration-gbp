@@ -127,7 +127,8 @@ export class NucleoService {
     const productsCombinedWithImages: ProductResponseDto[] = [];
     const productsCombined: ProductResponseDto[] = this.productResponseService.combineBaseAndStorageProducts(productsBaseDtos, productsStorageGroupDtos);
     
-    const limitedproductsCombined = productsCombined.slice(0, 1500); // Cantidad de productos combinados a los que se le busca la imagen.
+    // TODO: Cantidad de productos combinados a los que se le busca la imagen.
+    const limitedproductsCombined = productsCombined.slice(0, 1500);
     
     for (const productCombined of limitedproductsCombined) {    
       const imageResponseDtos: ImageResponseDto[] = await this.loadImagesById(productCombined.externalId);
@@ -136,7 +137,7 @@ export class NucleoService {
       productCombined.skus[0].files = imageResponseDtos;
       productsCombinedWithImages.push(productCombined);     
       this.logger.log(`Se ha cargado el producto combinado con imagenes número: ${productsCombinedWithImages.length}`);
-    }    
+    }
     return productsCombinedWithImages;
   }
 
