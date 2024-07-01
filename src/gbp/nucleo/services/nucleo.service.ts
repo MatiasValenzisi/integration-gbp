@@ -74,7 +74,7 @@ export class NucleoService {
         <wsFullJaus_Item_funGetXMLData xmlns="http://microsoft.com/webservices/" />
       </soap12:Body>`;          
 
-    const retryIntervals: number[] = [2, 5, 15, 20];
+    const retryIntervals: number[] = [5, 15, 20];
     const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody, retryIntervals);
     const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductBaseResponseDtoArray(soapResponse);    
     this.logger.log(`Se ha obtenido en el metodo getAllProductsBase, ${parseResponseData.length} productos base`);
@@ -92,7 +92,7 @@ export class NucleoService {
         </Item_funGetXMLDataByStorageGroup>
       </soap12:Body>`;  
 
-    const retryIntervals: number[] = [2, 5, 15, 20];
+    const retryIntervals: number[] = [5, 15, 20];
     const soapResponse: string = await this.axiosService.sendSoapPostRequest(token, soapBody, retryIntervals);
     const parseResponseData: ProductResponseDto[] = await this.productResponseService.parseResponseToProductStorageGroupResponseDtoArray(soapResponse);
     this.logger.log(`Se ha obtenido en el metodo getAllProductsStorageGroup, ${parseResponseData.length} productos de grupo de almacenamiento`);
