@@ -86,7 +86,7 @@ export class ProductResponseService {
     return productsResponse.NewDataSet.Table
       .filter(item => item.stock !== '' && Number(item.stock) > 0)
       .map(item => ({
-        externalId: Number(item.item_id),
+        externalId: item.item_id,
         name: item.item_desc,
         categoryId: item.cat_id,
         brandId: item.brand_id,
@@ -98,11 +98,11 @@ export class ProductResponseService {
           eanCode: item.item_vendorCode,
           referenceCode: item.item_code,
           name: item.item_desc,
-          sizeWidth: Number(item.item_wide),
-          sizeHeight: Number(item.item_higth),
-          sizeLength: Number(item.item_large),
-          volumen: Number(item.item_wide) * Number(item.item_higth) * Number(item.item_large),
-          weight: Number(item.item_weight),
+          sizeWidth: item.item_wide,
+          sizeHeight: item.item_higth,
+          sizeLength: item.item_large,
+          volumen: item.item_wide * item.item_higth * item.item_large,
+          weight: item.item_weight,
           active: item.item_disabled === 'true',
           stockInfinite: false,
           stockTotal: 0,

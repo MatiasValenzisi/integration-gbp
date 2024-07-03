@@ -12,9 +12,9 @@ export class ProductResponseDto {
   @Expose()
   name: string;
 
-  @IsString()
+  @IsNumber()
   @Expose()
-  categoryId: string;
+  categoryId: number;
 
   @IsString()
   @Expose()

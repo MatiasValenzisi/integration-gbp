@@ -10,7 +10,7 @@ export class ImageResponseDto {
   @Expose()
   order: number;
 
-  @IsString()
+  @IsNumber()
   @Expose()
-  productId: string;
+  productId: number;
 }

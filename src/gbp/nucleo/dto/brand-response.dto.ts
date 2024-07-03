@@ -1,10 +1,10 @@
-import { IsString, IsOptional, IsUrl } from 'class-validator';
+import { IsString, IsOptional, IsUrl, IsNumber } from 'class-validator';
 import { Expose } from 'class-transformer';
 
 export class BrandResponseDto {
-  @IsString()
+  @IsNumber()
   @Expose()
-  externalId: string;
+  externalId: number;
 
   @IsString()
   @Expose()

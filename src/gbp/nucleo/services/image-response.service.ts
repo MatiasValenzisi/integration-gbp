@@ -41,10 +41,10 @@ export class ImageResponseService {
         : [imagesResponse.NewDataSet.Table];
   
       const imageResponseDtos: Promise<ImageResponseDto>[] = tableData.map(async (item) => {
-        const filePath = await this.saveImageInLocal(item.item_id, Number(item.Order), item.item_picture);
+        const filePath = await this.saveImageInLocal(item.item_id, item.Order, item.item_picture);
         return {
           file: filePath,
-          order: Number(item.Order),
+          order: item.Order,
           productId: item.item_id,
         };
       });
@@ -56,13 +56,13 @@ export class ImageResponseService {
     }
   }
   
-  private async saveImageInLocal(id: string, order: number, base64: string): Promise<string> {
+  private async saveImageInLocal(id: number, order: number, base64: string): Promise<string> {
     try {
       const filename = `image_order_${order}.png`;
-      const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'image', id, filename); 
+      const imagePath = join(__dirname, '..', '..', 'public', 'nucleo', 'image', id.toString(), filename); 
   
       // Verificar si el directorio 'public/nucleo/img' existe, si no, crearlo.
-      await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'image', id), { recursive: true });      
+      await mkdir(join(__dirname, '..', '..', 'public', 'nucleo', 'image', id.toString()), { recursive: true });      
       await writeFile(imagePath, Buffer.from(base64, 'base64'));      
       return `www.url.s3.com/gbp/nucleo/image/${id}/${filename}`;
       
